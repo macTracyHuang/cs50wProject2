@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block title %}
+Flack-Home
+{% endblock %}
+{% block astyle %}
+
+{% endblock %}
+<!-- Other Css -->
+{%block css%}
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous"></link>
+  <link rel="stylesheet" href="{{url_for('static',filename="css/index.css")}}"></link>
+{%endblock%}
+<!-- Main Content -->
+{% block content %}
+<div class="row">
+  <div class="jumbotron col-lg-5 mx-5">
+    <h1 class="display-6">Flack Me!</h1>
+    <p class="lead">Flack is where you can make a connection with people having same interests</p>
+    <hr class="my-4">
+    <div class="lead">
+      <a class="btn btn-outline-primary btn-lg mr-5" id="learnmore" href="#" role="button">Learn more</a>
+      <a class="btn btn-outline-info btn-lg" id="contactus" href="#" role="button">Contact us</a>
+    </div>
+  </div>
+  <div class="col-lg-5 mx-5 py-5">
+    <form action="{{url_for('channels')}}" method="post" id="nameform">
+  <div class="form-group">
+    <h1 class="display-5">Starts Here</h1>
+    <i class="fa fa-comments fa-2x text-info"></i>
+    <label for="username">Name</label>
+    <div class="input-container">
+    <i class="fa fa-user icon"></i>
+    <input type="text" class="form-control input-filed" id="username" name="username" placeholder="Enter name you want to display">
+    <input type="hidden" id="cur_ch2" name="cur_ch" value="Flack"/>
+  </div>
+
+    <small id="emailHelp" class="form-text text-muted">We'll never share your information with anyone else.</small>
+  </div>
+  <hr class="my-4">
+  <div class="text-center">
+    <button type="submit" class=" btn btn-outline-primary btn-lg" id="start">Start Flask</button>
+  </div>
+</form>
+  </div>
+</div>
+{% endblock %}
+
+<!-- Other Scripts -->
+{%block scripts %}
+<script src="{{url_for('static',filename="scripts/index.js")}}"></script>
+{%endblock%}

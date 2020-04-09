@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+{% block title %}
+Flack-Channel
+{% endblock %}
+{% block astyle %}
+
+{% endblock %}
+<!-- Other Css -->
+{%block css%}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous"></link>
+<link rel="stylesheet" href="{{url_for('static',filename="css/channels.css")}}"></link>
+{%endblock%}
+<!-- Main Content -->
+{% block content %}
+<div class="wrapper mx-auto">
+  <!-- Sidebar -->
+  <nav id="sidebar" class="border rounded border-primary">
+    <div class="sidebar-header">
+      <h5 id="username"><span class="far fa-user-circle"></span></h5>
+    </div>
+    <h5 class="py-2 px-2">Channels<button type="button" class="btn btn-outline-primary border-0" id="addChannel" data-toggle="popover"><i class="fas fa-plus-circle text-info ml-1"></i></button></h5>
+      <!-- add search form -->
+      <form class="navbar-form navbar-right" role="search">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Search">
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-default">
+              <span class="fa fa-search"></span>
+            </button>
+          </span>
+        </div>
+      </form>
+      <ul class="list-unstyled components mb-0" id="chList">
+        {%for ch in channels%}
+        <li>
+          <a href="#">{{ch}}</a>
+        </li>
+        {%endfor%}
+      </ul>
+      <ul class="list-unstyled mb-0">
+        <li>
+          <a href="#">Direct Message</a>
+        </li>
+      </ul>
+
+      <!-- <li>
+      <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
+      <ul class="collapse list-unstyled" id="pageSubmenu">
+      <li>
+      <a href="#">Page 1</a>
+    </li>
+    <li>
+    <a href="#">Page 2</a>
+  </li>
+  <li>
+  <a href="#">Page 3</a>
+</li>
+</ul>
+</li> -->
+</nav>
+<!-- Page Content -->
+<div class=" border border-left-0 rounded border-primary" id="content">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <button type="button" id="sidebarCollapse" class="btn btn-info">
+        <i class="fas fa-align-left"></i>
+      </button>
+      <p id="currentCh"></p>
+    </div>
+  </nav>
+  <div class="mesgs">
+    <div class="msg_history bg-dark">
+      {%for msg in messages%}
+      {%if msg.username != username %}
+      <div class="incoming_msg">
+        <i class="incoming_msg_img fa fa-user icon"></i>
+        {{msg.username}}
+        <div class="received_msg">
+          <div class="received_withd_msg">
+            <p>{{msg.msg}}</p>
+            <span class="time_date"> {{msg.time_date}}</span>
+          </div>
+        </div>
+      </div>
+      {%else%}
+      <div class="outgoing_msg">
+        <div class="sent_msg">
+          <p>{{msg.msg}}</p>
+          <span class="time_date">{{msg.time_date}}</span>
+          </div>
+      </div>
+      {%endif%}
+      {%endfor%}
+    </div>
+        <div class="type_msg">
+          <div class="input_msg_write">
+            <button class="msg_send_btn float-right" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+            <span id="span1"><input type="text" class="write_msg w-100" placeholder="Type a message"/></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  <!-- Other Scripts -->
+  {%block scripts %}
+  <script src="{{url_for('static',filename="scripts/channels.js")}}"></script>
+  <!-- Handle Bar -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+  <!-- SocketIO -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+  <!-- Font Awesome JS -->
+  <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+  {%endblock%}
+  <!-- Script template -->
+  {%block template %}
+  {% raw -%}
+  <script id="aChannel" type="text/template">
+    <li>
+      <a href="#">{{chName}}</a>
+    </li>
+  </script>
+  <script id="in_msg" type="text/template">
+    <div class="incoming_msg">
+      <i class="incoming_msg_img fa fa-user icon"></i>
+      {{username}}
+      <div class="received_msg">
+        <div class="received_withd_msg">
+          <p>{{msg}}</p>
+          <span class="time_date"> {{time_date}}</span>
+        </div>
+      </div>
+    </div>
+  </script>
+  <script id="out_msg" type="text/template">
+    <div class="outgoing_msg">
+      <div class="sent_msg">
+        <p>{{msg}}</p>
+        <span class="time_date">{{time_date}}</span>
+        </div>
+      </div>
+  </script>
+  {%- endraw %}
+  {%endblock%}
