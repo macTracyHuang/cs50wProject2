@@ -33,7 +33,7 @@ Flack-Channel
       <ul class="list-unstyled components mb-0" id="chList">
         {%for ch in channels%}
         <li>
-          <a href="#">{{ch}}</a>
+          <a href="#" class="channel" id="{{ch}}">{{ch}}</a>
         </li>
         {%endfor%}
       </ul>
@@ -70,7 +70,7 @@ Flack-Channel
   </nav>
   <div class="mesgs">
     <div class="msg_history bg-dark">
-      {%for msg in messages%}
+      <!-- {%for msg in messages%}
       {%if msg.username != username %}
       <div class="incoming_msg">
         <i class="incoming_msg_img fa fa-user icon"></i>
@@ -90,7 +90,7 @@ Flack-Channel
           </div>
       </div>
       {%endif%}
-      {%endfor%}
+      {%endfor%} -->
     </div>
         <div class="type_msg">
           <div class="input_msg_write">
@@ -119,7 +119,7 @@ Flack-Channel
   {% raw -%}
   <script id="aChannel" type="text/template">
     <li>
-      <a href="#">{{chName}}</a>
+      <a href="#" class="channel" id="{{chName }}">{{chName}}</a>
     </li>
   </script>
   <script id="in_msg" type="text/template">

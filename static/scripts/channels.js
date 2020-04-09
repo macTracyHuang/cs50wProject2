@@ -18,9 +18,15 @@ content:
   </div>
 </div>`
 });
-
+//User name
+if (!localStorage.getItem('username')){
+  console.log('no name');
+};
+var cur_ch;
+const username=localStorage.getItem('username');
 document.addEventListener('DOMContentLoaded', () => {
-  var cur_ch;
+  //Initilize channel list onclick attribute
+  update_onclick()
   //Initialize Current channel
   if (!localStorage.getItem('last_ch')){
     cur_ch="Flack";
@@ -28,21 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   else{
     cur_ch=localStorage.getItem('last_ch');
-    console.log(cur_ch);
   }
+  //Set current channel dispaly name
   document.querySelector('#currentCh').innerHTML = cur_ch;
-  //User name
-  if (!localStorage.getItem('username')){
-    console.log('no name');
-  };
+  //load message
+  load_msg(cur_ch);
   //Channels List and Sidebar
   $('#sidebarCollapse').on('click', function () {
       $('#sidebar').toggleClass('active');
   });
-  document.querySelector('.msg_history').scrollTop = 9999999;
-  //get User
-  const username=localStorage.getItem('username');
-  console.log(username);
   document.querySelector('#username').insertAdjacentHTML('beforeend', username);
   //SocketIO
   // Connect to websocket
@@ -63,19 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
       $('[data-toggle="popover"]').popover("hide");
     };
   });
+  
   // When a new channel is announced, add to the unordered list
   socket.on('new channel', chName => {
       const template = Handlebars.compile(document.querySelector('#aChannel').innerHTML);
       const content = template({'chName': chName});
       document.querySelector('#chList').innerHTML += content;
+      update_onclick()
   });
 
+  //Enable press Enter to send messages
   document.querySelector('.write_msg').onkeypress = event => {
   // Number 13 is the "Enter" key on the keyboard
     if (event.keyCode === 13) {
       // Cancel the default action, if needed
       event.preventDefault();
-      console.log('doing');
       // Trigger the button element with a click
       $('.msg_send_btn').click();
     }
@@ -89,52 +91,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //Message announced
   socket.on('new msg', data => {
-    console.log("annoucing");
     const ch=data['ch'];
     const msg=data['newmsg'];
     if(ch === cur_ch){
-      if(msg.username === username){
-        const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
-        const content = template({'msg': msg.msg,'time_date':msg.time_date});
-        document.querySelector('.msg_history').innerHTML += content;
-        console.log(cur_ch);
-      }
-      else{
-        const template = Handlebars.compile(document.querySelector('#in_msg').innerHTML);
-        const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
-        document.querySelector('.msg_history').innerHTML += content;
-        console.log("else");
-      }
+      convert_msg(msg);
     }
     document.querySelector('.msg_history').scrollTop = 9999999;
   });
+
 });
 
-//Get channels
-function getChannels(){
-  if (!localStorage.getItem('channels')){
-    //try get from server via Ajax
-    const request = new XMLHttpRequest();
-    request.open('GET', "/channels");
-    // Callback function for when request completes
-    request.onload = () => {
-      const data = JSON.parse(request.responseText);
-      if (data.success){
-        for (ch in data.channels) {
-          channels.push(ch);
-        }
+function load_msg(channel){
+  const ch = channel
+  document.querySelector('#currentCh').innerHTML = ch;
+  //load messages of a channels
+  //try get from server via Ajax
+  const request = new XMLHttpRequest();
+  request.open('POST', "/loadmsg");
+  // Callback function for when request completes
+  request.onload = () => {
+    const data = JSON.parse(request.responseText);
+    if (data.success){
+      clear_content();
+      const msgs = data.msgs;
+      // loop through a dic using for/of instead of for/in
+      for (let msg of msgs) {
+        convert_msg(msg);
       }
-      else{
-        return false;
-      }
+      document.querySelector('.msg_history').scrollTop = document.querySelector('.msg_history').scrollHeight;
     }
-    request.send();
+    else{
+      return false;
+    }
+  }
+  // Add data to send with request
+  const data = new FormData();
+  data.append('ch', ch);
+  //send request
+  request.send(data);
+  cur_ch=ch;
+  localStorage.setItem('last_ch',ch);
+  console.log("loading");
+}
+//update channel onclick.
+function update_onclick(){
+  //Switch to another Channel
+  document.querySelectorAll('.channel').forEach(button => {
+    button.onclick = () => {
+      const ch = button.getAttribute('id');
+      cur_ch=ch
+      localStorage.setItem('last_ch',cur_ch);
+      load_msg(ch);
+    };
+  });
+}
+//Genrate msgs templates
+function convert_msg(msg){
+  if(msg.username === username){
+    const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
+    const content = template({'msg': msg.msg,'time_date':msg.time_date});
+    document.querySelector('.msg_history').innerHTML += content;
   }
   else{
-    return false;
+    const template = Handlebars.compile(document.querySelector('#in_msg').innerHTML);
+    const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
+    document.querySelector('.msg_history').innerHTML += content;
   }
 }
-//Display channels
-function disChannels(channels){
-
+//Clear msg_history
+function clear_content(){
+  document.querySelector('.msg_history').innerHTML = '';
 }
