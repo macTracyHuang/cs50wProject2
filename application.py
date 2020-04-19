@@ -2,6 +2,7 @@ from flask import Flask,render_template,url_for,request,jsonify,url_for,redirect
 from flask_socketio import SocketIO, emit
 import datetime, time
 import secrets
+from functools import wraps
 
 app=Flask(__name__)
 
@@ -10,6 +11,7 @@ app.config["SECRET_KEY"]=secrets.token_urlsafe(16)
 socketio = SocketIO(app)
 
 @app.route("/")
+@login_required
 def index():
     return render_template("index.html")
 
@@ -19,6 +21,7 @@ channels_data=["Flack"]
 messages={"Flack":[{"username":"Admin","msg":"Welcome to Flask","time_date":first_time}]}
 
 @app.route("/channels",methods=["GET","POST"])
+@login_required
 def channels():
     if request.method=="GET":
         return redirect(url_for('index'))
@@ -39,6 +42,26 @@ def loadmsg():
         else:
             msgs=messages[ch]
             return jsonify({"success":True,'msgs':msgs})
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        if session.get("id") is None:
+            flash('Please log in')
+            return render_template("login.html")
+        else:
+            flash('Already Logged In')
+            return render_template("index.html")
+
+    elif request.method == "POST":
+        #Get form information
+        password=request.form.get("password")
+        #check input is valid
+        if password != "1210":
+            flash("Invalid password")
+            return render_template("login.html")
+        session['id']="admin"
+        return render_template("index.html")
 
 #Socket
 @socketio.on("create channel")
@@ -65,6 +88,14 @@ def msg_send(data):
     #can save only 100 messages per channel
     if len(messages[ch]) >= 100:
         messages[ch]=messages[ch][0:1]
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
 
 if __name__ == '__main__':
     socketio.run(app)
