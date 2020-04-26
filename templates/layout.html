@@ -1,22 +1,31 @@
 <!doctype html>
 <html lang="en" class="h-100">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <title>{% block title %}{% endblock %}</title>
   <style>
-  {% block astyle %}
-  {% endblock %}
-    main > .container{
+    {
+      % block astyle %
+    }
+
+      {
+      % endblock %
+    }
+
+    main>.container {
       margin-top: 15vh;
     }
+
     .navbar-brand {
-      padding:0 !important;
+      padding: 0 !important;
     }
+
     #dogs {
-      max-width:230px;
-      max-height:95px;
+      max-width: 230px;
+      max-height: 95px;
       width: auto;
       height: auto;
       position: fixed;
@@ -31,6 +40,7 @@
   <!-- Custom styles for this template -->
   {%block css %}{%endblock%}
 </head>
+
 <body class="d-flex flex-column h-100">
   <header>
     <!-- Fixed navbar -->
@@ -44,27 +54,7 @@
           <li class="nav-item active">
             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
           </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="/channels">Channels</a>
-          </li> -->
         </ul>
-        <!-- <ul class="navbar-nav ml-auto">
-          {% if session.user_id %}
-          <li class="nav-item">
-            <a class="nav-link" href="#">{{ session.user_name }}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}">Log Out</a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}">Sign Up</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}">Log In</a>
-          </li>
-          {% endif %}
-        </ul> -->
       </div>
     </nav>
   </header>
@@ -75,21 +65,21 @@
       <!-- display alert -->
       {% with messages = get_flashed_messages() %}
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-success">
-            {{ message }}
-          </div>
-        {% endfor %}
+      {% for message in messages %}
+      <div class="alert alert-success">
+        {{ message }}
+      </div>
+      {% endfor %}
       {% endif %}
       {% endwith %}
 
       {% if status %}
-          <div class="alert alert-success">
-            {{ status }}
-          </div>
-      {% endif %}
+      <div class="alert alert-success">
+        {{ status }}
       </div>
-<!-- Main Content -->
+      {% endif %}
+    </div>
+    <!-- Main Content -->
     {%block content %}{%endblock%}
 
     </div>
@@ -112,4 +102,5 @@
   {%block template %}
   {%endblock%}
 </body>
+
 </html>
