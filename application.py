@@ -1,15 +1,9 @@
-from flask import Flask, render_template, url_for, request,\
+from flask import render_template, url_for, request,\
     jsonify, redirect, session, flash
-from flask_socketio import SocketIO, emit
+from flask_socketio import emit
 import datetime
-import secrets
 from functools import wraps
-
-app = Flask(__name__)
-
-# Initilize socketio
-app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
-socketio = SocketIO(app)
+from setup import app, socketio
 
 
 def login_required(f):
@@ -22,7 +16,7 @@ def login_required(f):
 
 
 @app.route("/")
-@login_required
+# @login_required
 def index():
     return render_template("index.html")
 
@@ -36,7 +30,7 @@ messages = {"Flack": [
 
 
 @app.route("/channels", methods=["GET", "POST"])
-@login_required
+# @login_required
 def channels():
     if request.method == "GET":
         return redirect(url_for('index'))

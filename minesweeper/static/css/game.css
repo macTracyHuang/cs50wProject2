@@ -1,0 +1,179 @@
+.cell {
+  float: left;
+  background-size: 100%;
+  font-weight: 700;
+  text-align: center;
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+  line-height: 23px;
+}
+
+.hd_closed {
+  background-image: url("../img/closed.svg");
+}
+
+.hd_check {
+  background-image: url("../img/pressed.svg");
+}
+
+.hd_flag {
+  background-image: url("../img/flag.svg");
+}
+
+.hd_flag.hint-wrong-flag {
+  background-image: url("../img/flag_red.svg");
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.wrapper {
+  border-collapse: separate;
+}
+
+.wrapper-border, .hd_wrapper-border-right-bottom, .hd_wrapper-border-left-bottom, .hd_wrapper-border-right-top, .hd_wrapper-border-left-top, .hd_wrapper-border-t-right, .hd_wrapper-border-t-left, .hd_wrapper-border-hor, .hd_wrapper-border-vert {
+  background-size: 100% 100%;
+  float: left;
+}
+
+.hd_wrapper-border-vert {
+  background-image: url("../img/border_vert_2x.png");
+}
+
+.hd_wrapper-border-hor {
+  background-image: url("../img/border_hor_2x.png");
+}
+
+.hd_wrapper-border-t-left {
+  background-image: url("../img/t_left_2x.png");
+}
+
+.hd_wrapper-border-t-right {
+  background-image: url("../img/t_right_2x.png");
+}
+
+.hd_wrapper-border-left-top {
+  background-image: url("../img/corner_up_left_2x.png");
+}
+
+.hd_wrapper-border-right-top {
+  background-image: url("../img/corner_up_right_2x.png");
+}
+
+.hd_wrapper-border-left-bottom {
+  background-image: url("../img/corner_bottom_left_2x.png");
+}
+
+.hd_wrapper-border-right-bottom {
+  background-image: url("../img/corner_bottom_right_2x.png");
+}
+
+.top-area {
+  float: left;
+  background: #b3b3b3;
+}
+
+.top-area-center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.numbers-panel {
+  background-size: 100%;
+}
+
+.top-area-num {
+  background-size: 100% 100%;
+}
+
+.hd_top-area-num0 {
+  background-image: url("../img/d0.svg");
+}
+
+.hd_top-area-num1 {
+  background-image: url("../img/d1.svg");
+}
+
+.hd_top-area-num2 {
+  background-image: url("../img/d2.svg");
+}
+
+.hd_top-area-num3 {
+  background-image: url("../img/d3.svg");
+}
+
+.hd_top-area-num4 {
+  background-image: url("../img/d4.svg");
+}
+
+.hd_top-area-num5 {
+  background-image: url("../img/d5.svg");
+}
+
+.hd_top-area-num6 {
+  background-image: url("../img/d6.svg");
+}
+
+.hd_top-area-num7 {
+  background-image: url("../img/d7.svg");
+}
+
+.hd_top-area-num8 {
+  background-image: url("../img/d8.svg");
+}
+
+.hd_top-area-num9 {
+  background-image: url("../img/d9.svg");
+}
+
+.hd_top-area-num- {
+  background-image: url("../img/d-.svg");
+}
+
+.top-area-face {
+  margin: 0 auto;
+  background-size: 100%;
+}
+
+.hd_top-area-face-unpressed {
+  background-image: url("../img/face_unpressed.svg");
+}
+
+.hd_top-area-face-win {
+  background-image: url("../img/face_win.svg");
+}
+
+.hd_top-area-face-lose {
+  background-image: url("../img/face_lose.svg");
+}
+
+.hd_top-area-face-pressed {
+  background-image: url("../img/face_pressed.svg");
+}
+
+.hd_numbers-panel {
+  background-image: url("../img/nums_background.svg");
+  background-size: 100%;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+.pull-left {
+  float: left;
+}
+
+.clear {
+  clear: both;
+}
+
+/*# sourceMappingURL=game.css.map */
