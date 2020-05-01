@@ -7,8 +7,10 @@ Flack-Home
 {% endblock %}
 <!-- Other Css -->
 {%block css%}
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous"></link>
-  <link rel="stylesheet" href="{{url_for('static',filename="css/index.css")}}"></link>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous">
+</link>
+<link rel="stylesheet" href="{{url_for('static',filename="css/index.css")}}">
+</link>
 {%endblock%}
 <!-- Main Content -->
 {% block content %}
@@ -24,23 +26,23 @@ Flack-Home
   </div>
   <div class="col-lg-5 mx-5 py-5">
     <form action="{{url_for('channels')}}" method="post" id="nameform">
-  <div class="form-group">
-    <h1 class="display-5">Starts Here</h1>
-    <i class="fa fa-comments fa-2x text-info"></i>
-    <label for="username">Name</label>
-    <div class="input-container">
-    <i class="fa fa-user icon"></i>
-    <input type="text" class="form-control input-filed" id="username" name="username" placeholder="Enter name you want to display">
-    <input type="hidden" id="cur_ch2" name="cur_ch" value="Flack"/>
-  </div>
+      <div class="form-group">
+        <h1 class="display-5">Starts Here</h1>
+        <i class="fa fa-comments fa-2x text-info"></i>
+        <label for="username">Name</label>
+        <div class="input-container">
+          <i class="fa fa-user icon"></i>
+          <input type="text" class="form-control input-filed" id="username" name="username" placeholder="Enter name you want to display">
+          <input type="hidden" id="cur_ch2" name="cur_ch" value="Flack" />
+        </div>
 
-    <small id="emailHelp" class="form-text text-muted">We'll never share your information with anyone else.</small>
-  </div>
-  <hr class="my-4">
-  <div class="text-center">
-    <button type="submit" class=" btn btn-outline-primary btn-lg" id="start">Start Flask</button>
-  </div>
-</form>
+        <small id="emailHelp" class="form-text text-muted">We'll never share your information with anyone else.</small>
+      </div>
+      <hr class="my-4">
+      <div class="text-center">
+        <button type="submit" class=" btn btn-outline-primary btn-lg" id="start">Start Flask</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
