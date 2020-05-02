@@ -1,5 +1,46 @@
+var mines = 99;
 document.addEventListener('DOMContentLoaded', function() {
-  initBoard()
+  var gameover = false;
+  var board = initBoard();
+  document.querySelectorAll('.cell').forEach(cell => {
+    //One click
+    cell.addEventListener('click', event => {
+      if(!gameover){
+        // const x = cell.getAttribute("data-x");
+        // const y = cell.getAttribute("data-y");
+        const id = cell.id;
+        const neighbors = getNeighbors(board.cells[id],30,16);
+        const n = board.cells[id].neighbor;
+        cell.classList.remove('closed');
+        cell.classList.add('type'+n,'check');
+        if(n === 0){
+          for (let neighbor of neighbors){
+            const nid = '#'+neighbor;
+            document.querySelector(nid).click();
+          }
+        }
+      }
+    });
+    //Double Click
+    cell.addEventListener('dblclick', event => {
+
+    });
+    //Right click
+    cell.addEventListener('contextmenu', e => {
+      if (!cell.classList.contains('check')){
+        cell.classList.toggle('closed');
+        cell.classList.toggle('flag');
+        if(cell.classList.contains('flag')){
+          mines--;
+        }
+        else{
+          mines++;
+        }
+        updateMines();
+      }
+      e.preventDefault();
+    });
+  });
 });
 
 // classes definition
@@ -32,7 +73,7 @@ class Cell {
 class Board {
   constructor(xSize, ySize, mineCount) {
     this.cells = {};
-    this.xSize=xSize;
+    this.xSize = xSize;
     this.ySize = ySize;
     this.mineCount = mineCount;
     //createBoard
@@ -55,8 +96,7 @@ class Board {
           cell = generateAMine();
         }
         mineLocation.push(cell);
-        console.log(i + ':put ' + cell);
-        aBoard.cells[cell].neighbor='x';
+        aBoard.cells[cell].neighbor = 10;
         aBoard.cells[cell].mined = true;
       }
       return aBoard;
@@ -79,46 +119,10 @@ class Board {
         if (!cells[cell].mined) {
           let neighbors = getNeighbors(cells[cell], xSize, ySize);
           for (let neighbor of neighbors) {
-            neighborMineCount += cells[neighbor].mined ? 1:0;
+            neighborMineCount += cells[neighbor].mined ? 1 : 0;
           }
           cells[cell].neighbor = neighborMineCount;
         }
-      }
-
-      function getNeighbors(cell, xSize, ySize) {
-        var neighbors = [];
-        let x = cell.x;
-        let y = cell.y;
-        //left
-        if (x !== 0) {
-          if (y !== 0) {
-            neighbors.push("cell_" + (x - 1) + "_" + (y - 1));
-          }
-
-          neighbors.push("cell_" + (x - 1) + "_" + y);
-
-          if (y !== ySize - 1) {
-            neighbors.push("cell_" + (x - 1) + "_" + (y + 1));
-          }
-        }
-        //middle
-        if (y !== 0) {
-          neighbors.push("cell_" + x + "_" + (y - 1));
-        }
-        if (y !== ySize - 1) {
-          neighbors.push("cell_" + x + "_" + (y + 1));
-        }
-        //right
-        if (x !== xSize - 1) {
-          if (y !== 0) {
-            neighbors.push("cell_" + (x + 1) + "_" + (y - 1));
-          }
-          neighbors.push("cell_" + (x + 1) + "_" + y);
-          if (y !== ySize - 1) {
-            neighbors.push("cell_" + (x + 1) + "_" + (y + 1));
-          }
-        }
-        return neighbors;
       }
     }
   }
@@ -129,16 +133,72 @@ class Board {
   }
 }
 
-function initBoard(){
+function getNeighbors(cell, xSize, ySize) {
+  var neighbors = [];
+  let x = cell.x;
+  let y = cell.y;
+  //left
+  if (x !== 0) {
+    if (y !== 0) {
+      neighbors.push("cell_" + (x - 1) + "_" + (y - 1));
+    }
+
+    neighbors.push("cell_" + (x - 1) + "_" + y);
+
+    if (y !== ySize - 1) {
+      neighbors.push("cell_" + (x - 1) + "_" + (y + 1));
+    }
+  }
+  //middle
+  if (y !== 0) {
+    neighbors.push("cell_" + x + "_" + (y - 1));
+  }
+  if (y !== ySize - 1) {
+    neighbors.push("cell_" + x + "_" + (y + 1));
+  }
+  //right
+  if (x !== xSize - 1) {
+    if (y !== 0) {
+      neighbors.push("cell_" + (x + 1) + "_" + (y - 1));
+    }
+    neighbors.push("cell_" + (x + 1) + "_" + y);
+    if (y !== ySize - 1) {
+      neighbors.push("cell_" + (x + 1) + "_" + (y + 1));
+    }
+  }
+  return neighbors;
+}
+
+function initBoard() {
   const template = Handlebars.compile(document.querySelector('#aCell').innerHTML);
   const newBoard = new Board(30, 16, 99);
-  for (let y  =0;y<newBoard.ySize;y++){
-    for(let x =0;x<newBoard.xSize;x++){
+  for (let y = 0; y < newBoard.ySize; y++) {
+    for (let x = 0; x < newBoard.xSize; x++) {
       let cell = "cell_" + x + "_" + y;
-      const content = template({'cell_id': cell,'cell_x':x, 'cell_y':y});
+      const content = template({
+        'cell_id': cell,
+        'cell_x': x,
+        'cell_y': y
+      });
       document.querySelector('#A4').innerHTML += content;
     }
     const clear = `<div class="clear"></div>`;
     document.querySelector('#A4').innerHTML += clear;
   }
+  return newBoard;
+}
+
+function updateMines(){
+  let m = mines;
+  let s =[];
+  while(m > 0){
+    s.push(m%10);
+    m = Math.floor(m/10);
+  }
+  let mines_10 = s[1];
+  let mines_1 = s[0];
+  document.querySelector('#top_area_mines_10').className="";
+  document.querySelector('#top_area_mines_10').classList.add('top-area-num', 'pull-left','top-area-num'+mines_10);
+  document.querySelector('#top_area_mines_1').className="";
+  document.querySelector('#top_area_mines_1').classList.add('top-area-num', 'pull-left','top-area-num'+mines_1);
 }

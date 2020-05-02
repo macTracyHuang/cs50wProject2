@@ -9,19 +9,67 @@
   line-height: 23px;
 }
 
-.hd_closed {
+.closed {
   background-image: url("../img/closed.svg");
 }
 
-.hd_check {
+.check {
   background-image: url("../img/pressed.svg");
 }
 
-.hd_flag {
+.type0 {
+  background-image: url("../img/type0.svg");
+}
+
+.type1 {
+  background-image: url("../img/type1.svg");
+}
+
+.type2 {
+  background-image: url("../img/type2.svg");
+}
+
+.type3 {
+  background-image: url("../img/type3.svg");
+}
+
+.type4 {
+  background-image: url("../img/type4.svg");
+}
+
+.type5 {
+  background-image: url("../img/type5.svg");
+}
+
+.type6 {
+  background-image: url("../img/type6.svg");
+}
+
+.type7 {
+  background-image: url("../img/type7.svg");
+}
+
+.type8 {
+  background-image: url("../img/type8.svg");
+}
+
+.type10 {
+  background-image: url("../img/mine.svg");
+}
+
+.type11 {
+  background-image: url("../img/mine_red.svg");
+}
+
+.type12 {
+  background-image: url("../img/mine_wrong.svg");
+}
+
+.flag {
   background-image: url("../img/flag.svg");
 }
 
-.hd_flag.hint-wrong-flag {
+.flag.hint-wrong-flag {
   background-image: url("../img/flag_red.svg");
 }
 
@@ -38,40 +86,40 @@
   border-collapse: separate;
 }
 
-.wrapper-border, .hd_wrapper-border-right-bottom, .hd_wrapper-border-left-bottom, .hd_wrapper-border-right-top, .hd_wrapper-border-left-top, .hd_wrapper-border-t-right, .hd_wrapper-border-t-left, .hd_wrapper-border-hor, .hd_wrapper-border-vert {
+.wrapper-border, .wrapper-border-right-bottom, .wrapper-border-left-bottom, .wrapper-border-right-top, .wrapper-border-left-top, .wrapper-border-t-right, .wrapper-border-t-left, .wrapper-border-hor, .wrapper-border-vert {
   background-size: 100% 100%;
   float: left;
 }
 
-.hd_wrapper-border-vert {
+.wrapper-border-vert {
   background-image: url("../img/border_vert_2x.png");
 }
 
-.hd_wrapper-border-hor {
+.wrapper-border-hor {
   background-image: url("../img/border_hor_2x.png");
 }
 
-.hd_wrapper-border-t-left {
+.wrapper-border-t-left {
   background-image: url("../img/t_left_2x.png");
 }
 
-.hd_wrapper-border-t-right {
+.wrapper-border-t-right {
   background-image: url("../img/t_right_2x.png");
 }
 
-.hd_wrapper-border-left-top {
+.wrapper-border-left-top {
   background-image: url("../img/corner_up_left_2x.png");
 }
 
-.hd_wrapper-border-right-top {
+.wrapper-border-right-top {
   background-image: url("../img/corner_up_right_2x.png");
 }
 
-.hd_wrapper-border-left-bottom {
+.wrapper-border-left-bottom {
   background-image: url("../img/corner_bottom_left_2x.png");
 }
 
-.hd_wrapper-border-right-bottom {
+.wrapper-border-right-bottom {
   background-image: url("../img/corner_bottom_right_2x.png");
 }
 
@@ -94,47 +142,47 @@
   background-size: 100% 100%;
 }
 
-.hd_top-area-num0 {
+.top-area-num0 {
   background-image: url("../img/d0.svg");
 }
 
-.hd_top-area-num1 {
+.top-area-num1 {
   background-image: url("../img/d1.svg");
 }
 
-.hd_top-area-num2 {
+.top-area-num2 {
   background-image: url("../img/d2.svg");
 }
 
-.hd_top-area-num3 {
+.top-area-num3 {
   background-image: url("../img/d3.svg");
 }
 
-.hd_top-area-num4 {
+.top-area-num4 {
   background-image: url("../img/d4.svg");
 }
 
-.hd_top-area-num5 {
+.top-area-num5 {
   background-image: url("../img/d5.svg");
 }
 
-.hd_top-area-num6 {
+.top-area-num6 {
   background-image: url("../img/d6.svg");
 }
 
-.hd_top-area-num7 {
+.top-area-num7 {
   background-image: url("../img/d7.svg");
 }
 
-.hd_top-area-num8 {
+.top-area-num8 {
   background-image: url("../img/d8.svg");
 }
 
-.hd_top-area-num9 {
+.top-area-num9 {
   background-image: url("../img/d9.svg");
 }
 
-.hd_top-area-num- {
+.top-area-num- {
   background-image: url("../img/d-.svg");
 }
 
@@ -143,23 +191,23 @@
   background-size: 100%;
 }
 
-.hd_top-area-face-unpressed {
+.top-area-face-unpressed {
   background-image: url("../img/face_unpressed.svg");
 }
 
-.hd_top-area-face-win {
+.top-area-face-win {
   background-image: url("../img/face_win.svg");
 }
 
-.hd_top-area-face-lose {
+.top-area-face-lose {
   background-image: url("../img/face_lose.svg");
 }
 
-.hd_top-area-face-pressed {
+.top-area-face-pressed {
   background-image: url("../img/face_pressed.svg");
 }
 
-.hd_numbers-panel {
+.numbers-panel {
   background-image: url("../img/nums_background.svg");
   background-size: 100%;
 }
