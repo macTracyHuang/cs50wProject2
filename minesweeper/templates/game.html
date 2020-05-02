@@ -31,11 +31,11 @@ Game
             <div class="" style="width: 61.5px; height: 3px;"></div>
             <div class="" style="width: 61.5px; height: 31.5px;">
               <div class="pull-left " style="width: 3px; height: 31.5px;"></div>
-              <div id="top_area_mines_100" class="top-area-num0 top-area-num pull-left " style="width: 16.5px; height: 31.5px;"></div>
+              <div id="top_area_mines_100" class="top-area-num pull-left " style="width: 16.5px; height: 31.5px;"></div>
               <div class="pull-left " style="width: 3px; height: 31.5px;"></div>
-              <div id="top_area_mines_10" class="top-area-num pull-left  top-area-num9" style="width: 16.5px; height: 31.5px;"></div>
+              <div id="top_area_mines_10" class="top-area-num pull-left" style="width: 16.5px; height: 31.5px;"></div>
               <div class="pull-left " style="width: 3px; height: 31.5px;"></div>
-              <div id="top_area_mines_1" class="top-area-num pull-left  top-area-num9" style="width: 16.5px; height: 31.5px;"></div>
+              <div id="top_area_mines_1" class="top-area-num pull-left" style="width: 16.5px; height: 31.5px;"></div>
             </div>
           </div>
           <div class="numbers-panel pull-right " style="width: 61.5px; height: 37.5px;">
@@ -65,9 +65,9 @@ Game
       <div class="wrapper-border-vert " style="width: 18px; height: 384px;"></div>
       <!-- Cells -->
       <div id="A4" class="pull-left">
-        <!-- <div id="cell_4_1" class="cell size24 closed" data-x="4" data-y="1"></div>
-        <div id="cell_5_1" class="cell size24 closed" data-x="5" data-y="1"></div>
-        <div id="cell_6_1" class="cell size24 closed" data-x="6" data-y="1"></div> -->
+        <!-- <div id="cell_4_1" class="cell closed" data-x="4" data-y="1"></div>
+        <div id="cell_5_1" class="cell closed" data-x="5" data-y="1"></div>
+        <div id="cell_6_1" class="cell closed" data-x="6" data-y="1"></div> -->
       </div>
       <div class="wrapper-border-vert " style="width: 18px; height: 384px;"></div>
     </div>
@@ -95,7 +95,7 @@ Game
 {%block template %}
 {% raw -%}
 <script id="aCell" type="text/template">
-  <div id="{{cell_id}}" class="cell size24 closed" data-x="{{cell_x}}" data-y="{{cell_y}}">
+  <div id="{{cell_id}}" class="cell closed" data-x="{{cell_x}}" data-y="{{cell_y}}">
   </div>
 </script>
 {%- endraw %}
