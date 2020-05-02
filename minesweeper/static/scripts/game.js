@@ -357,7 +357,7 @@ function opencell(sid){
 
   if (gameover) {
     console.log('gameover');
-    document.querySelectorAll('.innercell').forEach(innerinnercell => {
+    document.querySelectorAll('.innercell').forEach(innercell => {
       let n = board.innercells[innercell.id].neighbor;
       if (!board.innercells[innercell.id].opened) {
         //wrong flag
@@ -368,7 +368,6 @@ function opencell(sid){
           innercell.classList.remove('closed');
           innercell.classList.remove('flag');
           innercell.classList.add('type' + n);
-          checked++;
           innercell.opened = true;
         }
       }
