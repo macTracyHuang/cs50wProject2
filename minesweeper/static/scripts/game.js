@@ -357,18 +357,23 @@ function opencell(sid){
 
   if (gameover) {
     console.log('gameover');
-    document.querySelectorAll('.innercell').forEach(innercell => {
-      let n = board.innercells[innercell.id].neighbor;
-      if (!board.innercells[innercell.id].opened) {
-        //wrong flag
-        if ((board.innercells[innercell.id].flagged && n !== 10) || n === 10) {
+    document.querySelectorAll('.cell').forEach(innercell => {
+      console.log(innercell.id);
+      let n = board.cells[innercell.id].neighbor;
+      if (!board.cells[innercell.id].opened) {
+
+        if ((board.cells[innercell.id].flagged && n !== 10) || n === 10) {
+          //wrong flag
           if (n !== 10) {
             n = 12;
+            innercell.classList.remove('flag');
           }
-          innercell.classList.remove('closed');
-          innercell.classList.remove('flag');
+          //others
+          else{
+            innercell.classList.remove('closed');
+          }
           innercell.classList.add('type' + n);
-          innercell.opened = true;
+          board.cells[innercell.id].opened = true;
         }
       }
     });
