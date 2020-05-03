@@ -88,8 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     first=true;
     gameover = false;
     time = 0;
-    stopTime();
-    startTime();
     if(sync){
       console.log('socket: newboard: ' + data['board'].xSize + ' from: ' + data['username']);
       const fromuser = data['username'];
@@ -363,7 +361,7 @@ var isdown=false;
         if (sync){
         //update to other users
         socket.emit('open cell', {
-          'cell': board.cells[neighbor]
+          'cell': board.cells[id]
         });
         console.log('double emit');
         }
@@ -432,6 +430,10 @@ var isdown=false;
 
 function opencell(sid){
   if(!gameover&&!board.cells[sid].opened){
+    if(sync && first){
+      startTime();
+      first=false;
+    }
     const cell = document.querySelector('#'+sid);
     const neighbors = getNeighbors(board.cells[sid], 30, 16);
     // const x = cell.getAttribute("data-x");
