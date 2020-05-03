@@ -360,6 +360,13 @@ var isdown=false;
       }
       if (!gameover &&isdown && !board.cells[id].opened && event.button === 0) {
         opencell(id);
+        if (sync){
+        //update to other users
+        socket.emit('open cell', {
+          'cell': board.cells[neighbor]
+        });
+        console.log('double emit');
+        }
       }
       isdown=false;
     });
