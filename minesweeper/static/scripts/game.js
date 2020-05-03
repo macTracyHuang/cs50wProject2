@@ -173,7 +173,7 @@ var isdown=false;
           const neighbors = getNeighbors(board.cells[id], 30, 16);
           for (let neighbor of neighbors){
             let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('closed')){
+            if(n.classList.contains('closed') && !n.classList.contains('flag')){
               n.classList.remove('closed');
               n.classList.add('check');
             }
@@ -192,7 +192,7 @@ var isdown=false;
           const neighbors = getNeighbors(board.cells[downid], 30, 16);
           for (let neighbor of neighbors){
             let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('check')){
+            if(n.classList.contains('check')&&!n.classList.contains('flag')){
               n.classList.toggle('closed');
               n.classList.toggle('check');
             }
@@ -207,7 +207,7 @@ var isdown=false;
           const neighbors = getNeighbors(board.cells[id], 30, 16);
           for (let neighbor of neighbors){
             let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('closed')){
+            if(n.classList.contains('closed')&&!n.classList.contains('flag')){
               n.classList.toggle('closed');
               n.classList.toggle('check');
             }
@@ -226,7 +226,7 @@ var isdown=false;
         const neighbors = getNeighbors(board.cells[downid], 30, 16);
         for (let neighbor of neighbors){
           let n = document.querySelector('#'+neighbor);
-          if(!board.cells[neighbor].opened){
+          if(!board.cells[neighbor].opened&&!n.classList.contains('flag')){
             n.classList.add('closed');
             n.classList.remove('check');
           }
