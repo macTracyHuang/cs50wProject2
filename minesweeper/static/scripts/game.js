@@ -5,9 +5,27 @@ var board;
 var time;
 var checked = 0;
 var downid;
-document.addEventListener('DOMContentLoaded', function() {
-  initBoard();
-});
+var first=true;
+var timerid;
+function startTime(){
+  timerid = setInterval(myTimer, 1000);
+}
+function stopTime(){
+  clearInterval(timerid);
+  updateTime();
+}
+function myTimer() {
+  time+=1;
+  if(time<=999){
+    updateTime();
+  }
+}
+
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initBoard();
+  });
 //End DOMContentLoaded
 
 // classes definition
@@ -140,10 +158,12 @@ function getNeighbors(cell, xSize, ySize) {
 function initBoard() {
   const template = Handlebars.compile(document.querySelector('#aCell').innerHTML);
   const newBoard = new Board(30, 16, startmines);
+  first=true;
   gameover = false;
   mines = startmines;
   board = newBoard;
   time = 0;
+  stopTime();
   updateMines();
   document.querySelector('#A4').innerHTML = "";
   for (let y = 0; y < newBoard.ySize; y++) {
@@ -166,6 +186,10 @@ var isdown=false;
     const id = cell.id;
     //One click
     cell.addEventListener('mousedown', event => {
+      if(first){
+        startTime();
+        first=false;
+      }
       if(!gameover && event.button === 0 &&!board.cells[id].flagged){
         console.log(!board.cells[id].flagged);
         downid=id;
@@ -297,8 +321,10 @@ var isdown=false;
       //restart game
       checked = 0;
       mines = startmines;
+      first=true;
       gameover = false;
       time = 0;
+      stopTime();
       for (let x = 0; x < board.xSize; x++) {
         for (let y = 0; y < board.ySize; y++) {
           let id = "cell_" + x + "_" + y;
@@ -358,7 +384,7 @@ function opencell(sid){
   }
 
   if (gameover) {
-    console.log('gameover');
+    stopTime();
     document.querySelectorAll('.cell').forEach(innercell => {
       console.log(innercell.id);
       let n = board.cells[innercell.id].neighbor;
@@ -402,4 +428,21 @@ function updateMines() {
   document.querySelector('#top_area_mines_10').classList.add('top-area-num', 'pull-left', 'top-area-num' + mines_10);
   document.querySelector('#top_area_mines_1').className = "";
   document.querySelector('#top_area_mines_1').classList.add('top-area-num', 'pull-left', 'top-area-num' + mines_1);
+}
+function updateTime() {
+  let t = time;
+  let s = [];
+  while (t > 0) {
+    s.push(t % 10);
+    t = Math.floor(t / 10);
+  }
+  let time_100 = (s[2] === undefined) ? 0 : s[2];
+  let time_10 = (s[1] === undefined) ? 0 : s[1];
+  let time_1 = (s[0] === undefined) ? 0 : s[0];
+  document.querySelector('#top_area_time_100').className = "";
+  document.querySelector('#top_area_time_100').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_100);
+  document.querySelector('#top_area_time_10').className = "";
+  document.querySelector('#top_area_time_10').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_10);
+  document.querySelector('#top_area_time_1').className = "";
+  document.querySelector('#top_area_time_1').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_1);
 }

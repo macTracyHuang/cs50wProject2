@@ -14,7 +14,7 @@ Game
 <!-- Main Content -->
 {% block content %}
 <div id="W8">
-  <div id="game" class="wrapper noselect" style="width: 786px;">
+  <div id="game" class="wrapper noselect mx-auto" style="width: 786px;">
     <div class="" style="width: 756px; height: 16.5px;">
       <div class="wrapper-border-left-top " style="width: 18px; height: 16.5px;"></div>
       <div class="wrapper-border-hor " style="width: 720px; height: 16.5px;"></div>
@@ -82,7 +82,7 @@ Game
 
 <!-- Other Scripts -->
 {%block scripts %}
-<script src="{{url_for('minesweeper.static',filename="scripts/game.js")}}"></script>
+<script src="{{url_for('minesweeper.static',filename="scripts/game.min.js")}}"></script>
 <!-- Handle Bar -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <!-- SocketIO -->
