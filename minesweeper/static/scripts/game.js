@@ -74,11 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('new flag', data => {
     const fromcell = data['cell'];
     //flag cell locally
-    if (!board.cells[fromcell.id].flagged) {
-      let htmlcell=document.querySelector('#'+fromcell.id);
-      console.log('socket: newflag: ' + data['cell'].id + ' from: ' + data['username']);
-      flagcell(htmlcell);
-    }
+    let htmlcell=document.querySelector('#'+fromcell.id);
+    console.log('socket: newflag: ' + data['cell'].id + ' from: ' + data['username']);
+    flagcell(htmlcell);
   });
   //receive invitation
   socket.on('update board', data => {
