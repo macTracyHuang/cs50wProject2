@@ -19,6 +19,7 @@ function startTime(){
   timerid = setInterval(myTimer, 1000);
 }
 function stopTime(){
+  console.log('stoptime');
   clearInterval(timerid);
   updateTime();
 }
@@ -87,6 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
     first=true;
     gameover = false;
     time = 0;
+    stopTime();
+    startTime();
     if(sync){
       console.log('socket: newboard: ' + data['board'].xSize + ' from: ' + data['username']);
       const fromuser = data['username'];
@@ -357,11 +360,6 @@ var isdown=false;
       }
       if (!gameover &&isdown && !board.cells[id].opened && event.button === 0) {
         opencell(id);
-        if (sync){
-          //update to other users
-          socket.emit('open cell', {'cell': board.cells[id]});
-          console.log('open emit');
-        }
       }
       isdown=false;
     });
@@ -379,6 +377,13 @@ var isdown=false;
               setTimeout(function() {
                 downid=id;
                 opencell(neighbor);
+                if (sync){
+                //update to other users
+                socket.emit('open cell', {
+                  'cell': board.cells[neighbor]
+                });
+                console.log('double emit');
+                }
               }, 3);
             }
           }
