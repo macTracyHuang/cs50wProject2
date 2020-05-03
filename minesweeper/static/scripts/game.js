@@ -166,7 +166,8 @@ var isdown=false;
     const id = cell.id;
     //One click
     cell.addEventListener('mousedown', event => {
-      if(!gameover && event.button === 0){
+      if(!gameover && event.button === 0 &&!board.cells[id].flagged){
+        console.log(!board.cells[id].flagged);
         downid=id;
         isdown=true;
         if(board.cells[id].opened){
@@ -232,10 +233,10 @@ var isdown=false;
           }
         }
       }
-      isdown=false;
-      if (!gameover && !board.cells[id].opened && event.button === 0) {
+      if (!gameover &&isdown && !board.cells[id].opened && event.button === 0) {
         opencell(id);
       }
+      isdown=false;
     });
     //Double Click
     cell.addEventListener('dblclick', event => {
