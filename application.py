@@ -33,7 +33,7 @@ messages = {"Flack": [
 
 
 @app.route("/channels", methods=["GET", "POST"])
-# @login_required
+@login_required
 def channels():
     if request.method == "GET":
         return redirect(url_for('index'))
