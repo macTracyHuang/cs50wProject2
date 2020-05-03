@@ -7,6 +7,14 @@ var checked = 0;
 var downid;
 var first=true;
 var timerid;
+var sync =false;
+
+//Get User name
+if (!localStorage.getItem('username')){
+  console.log('no name');
+};
+const username=localStorage.getItem('username');
+
 function startTime(){
   timerid = setInterval(myTimer, 1000);
 }
@@ -21,11 +29,102 @@ function myTimer() {
   }
 }
 
+//SocketIO
+// Connect to websocket
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
+// When connected, Do Something
+socket.on('connect', () => {
+});
+//Error Listener
+socket.on('error', error => {
+    alert(error);
+});
 
-  document.addEventListener('DOMContentLoaded', function() {
-    initBoard();
+document.querySelector('#invite').onclick = function() {
+  // XNOR
+  sync= (sync === false);
+  if(sync){
+    restart();
+    this.innerHTML = "Cancel";
+    socket.emit('invite', {'board': board});
+    console.log('invite others');
+  }
+  else{
+    this.innerHTML = "Invite";
+    socket.emit('cancel sync',{});
+    console.log('cancel sync send');
+  }
+  this.classList.toggle('sync');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  //Socket Listeners
+  //new cell
+  socket.on('new open', data => {
+    console.log('socket: newopen: ' + data['cell'].id + ' from: ' + data['username']);
+    const fromcell = data['cell'];
+    //opencell locally
+    if (!board.cells[fromcell.id].opened) {
+      opencell(fromcell.id);
+    }
   });
+  //new flag
+  socket.on('new flag', data => {
+    const fromcell = data['cell'];
+    //flag cell locally
+    if (!board.cells[fromcell.id].flagged) {
+      let htmlcell=document.querySelector('#'+fromcell.id);
+      console.log('socket: newflag: ' + data['cell'].id + ' from: ' + data['username']);
+      flagcell(htmlcell);
+    }
+  });
+  //receive invitation
+  socket.on('update board', data => {
+    console.log('update board received');
+    checked = 0;
+    mines = startmines;
+    first=true;
+    gameover = false;
+    time = 0;
+    if(sync){
+      console.log('socket: newboard: ' + data['board'].xSize + ' from: ' + data['username']);
+      const fromuser = data['username'];
+      const fromboard = data['board'];
+      alert(fromuser + ' invites you to play together');
+      //sync
+      document.querySelectorAll('.cell').forEach((item, i) => {
+        item.className="";
+        item.classList.add('cell', 'closed');
+      });
+      board = fromboard;
+      let face = document.querySelector('#top_area_face')
+      face.className="";
+      face.classList.add('top-area-face','top-area-face-unpressed');
+    }
+  });
+
+  //update sync
+  socket.on('update sync', data =>{
+    let newsync = data['sync'];
+    let invitebtn =document.querySelector('#invite');
+    sync = newsync;
+    console.log(newsync);
+    if(sync){
+      invitebtn.innerHTML = "Cancel";
+      console.log('sync receive');
+    }
+    else{
+      invitebtn.innerHTML = "Invite";
+      console.log('cancel sync receive');
+    }
+    invitebtn.classList.toggle('sync');
+  });
+  //End socketlisteners
+
+  //initBoard when app start
+  initBoard();
+});
 //End DOMContentLoaded
 
 // classes definition
@@ -191,7 +290,6 @@ var isdown=false;
         first=false;
       }
       if(!gameover && event.button === 0 &&!board.cells[id].flagged){
-        console.log(!board.cells[id].flagged);
         downid=id;
         isdown=true;
         if(board.cells[id].opened){
@@ -259,12 +357,16 @@ var isdown=false;
       }
       if (!gameover &&isdown && !board.cells[id].opened && event.button === 0) {
         opencell(id);
+        if (sync){
+          //update to other users
+          socket.emit('open cell', {'cell': board.cells[id]});
+          console.log('open emit');
+        }
       }
       isdown=false;
     });
     //Double Click
     cell.addEventListener('dblclick', event => {
-      console.log('dbclick');
       if (!gameover) {
         const neighbors = getNeighbors(board.cells[id], 30, 16);
         let flags = 0;
@@ -285,22 +387,12 @@ var isdown=false;
     });
     //Right click
     cell.addEventListener('contextmenu', e => {
-      if (!gameover) {
-        if (!board.cells[cell.id].opened) {
-          cell.classList.toggle('closed');
-          cell.classList.toggle('flag');
-          if (cell.classList.contains('flag')) {
-            board.cells[id].flagged = true;
-            mines--;
-          } else {
-            board.cells[id].flagged = false;
-            mines++;
-          }
-          updateMines();
-        }
-        isdown=false;
-        e.preventDefault();
+      flagcell(cell);
+      if (sync){
+        socket.emit('flag cell',{'cell':board.cells[cell.id]});
       }
+      isdown=false;
+      e.preventDefault();
     });
   });
 
@@ -318,27 +410,10 @@ var isdown=false;
     if(event.button===0){
       face.classList.toggle('top-area-face-pressed');
       face.classList.add('top-area-face-unpressed');
-      //restart game
-      checked = 0;
-      mines = startmines;
-      first=true;
-      gameover = false;
-      time = 0;
-      stopTime();
-      for (let x = 0; x < board.xSize; x++) {
-        for (let y = 0; y < board.ySize; y++) {
-          let id = "cell_" + x + "_" + y;
-          board.cells[id].opened = false;
-          board.cells[id].flagged = false;
-          board.cells[id].mined = false;
-          board.cells[id].neighbor = 0;
-          document.querySelector('#' + id).className = "";
-          document.querySelector('#' + id).classList.add('cell', 'closed');
-        }
+      restart();
+      if(sync){
+        socket.emit('invite', {'board': board});
       }
-      updateMines();
-      Board.randomlyAssignMines(board);
-      Board.calculateNeighborMineCounts(board);
     }
   });
 }
@@ -372,6 +447,7 @@ function opencell(sid){
     cell.classList.remove('closed');
     cell.classList.add('type' + n);
     checked++;
+    console.log(checked);
     board.cells[sid].opened = true;
   }
   //check win
@@ -386,7 +462,7 @@ function opencell(sid){
   if (gameover) {
     stopTime();
     document.querySelectorAll('.cell').forEach(innercell => {
-      console.log(innercell.id);
+      // console.log('gameover');
       let n = board.cells[innercell.id].neighbor;
       if (!board.cells[innercell.id].opened) {
 
@@ -405,6 +481,24 @@ function opencell(sid){
         }
       }
     });
+  }
+}
+
+//flag cell
+function flagcell(cell){
+  if (!gameover) {
+    if (!board.cells[cell.id].opened) {
+      cell.classList.toggle('closed');
+      cell.classList.toggle('flag');
+      if (cell.classList.contains('flag')) {
+        board.cells[cell.id].flagged = true;
+        mines--;
+      } else {
+        board.cells[cell.id].flagged = false;
+        mines++;
+      }
+      updateMines();
+    }
   }
 }
 
@@ -445,4 +539,31 @@ function updateTime() {
   document.querySelector('#top_area_time_10').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_10);
   document.querySelector('#top_area_time_1').className = "";
   document.querySelector('#top_area_time_1').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_1);
+}
+
+function restart(){
+  let face = document.querySelector('#top_area_face');
+  face.className="";
+  face.classList.add('top-area-face','top-area-face-unpressed');
+  //restart game
+  checked = 0;
+  mines = startmines;
+  first=true;
+  gameover = false;
+  time = 0;
+  stopTime();
+  for (let x = 0; x < board.xSize; x++) {
+    for (let y = 0; y < board.ySize; y++) {
+      let id = "cell_" + x + "_" + y;
+      board.cells[id].opened = false;
+      board.cells[id].flagged = false;
+      board.cells[id].mined = false;
+      board.cells[id].neighbor = 0;
+      document.querySelector('#' + id).className = "";
+      document.querySelector('#' + id).classList.add('cell', 'closed');
+    }
+  }
+  updateMines();
+  Board.randomlyAssignMines(board);
+  Board.calculateNeighborMineCounts(board);
 }

@@ -4,6 +4,9 @@ from flask_socketio import emit
 import datetime
 from functools import wraps
 from setup import app, socketio
+from minesweeper import bp as game_bp
+
+app.register_blueprint(game_bp, url_prefix='/game')
 
 
 def login_required(f):
@@ -36,10 +39,12 @@ def channels():
         return redirect(url_for('index'))
     elif request.method == "POST":
         username = request.form.get('username')
-        ch = request.form.get('cur_ch')
-        return render_template(
-            'channels.html', channels=channels_data,
-            messages=messages[ch], username=username)
+        session['username'] = username
+        # ch = request.form.get('cur_ch')
+        # return render_template(
+        #     'channels.html', channels=channels_data,
+        #     messages=messages[ch], username=username)
+        return redirect('game')
 
 
 @app.route("/loadmsg", methods=["GET", "POST"])
