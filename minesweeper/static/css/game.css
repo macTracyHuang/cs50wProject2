@@ -3,7 +3,7 @@ body::after {
   width: 0;
   height: 0;
   overflow: hidden;
-  z-index: -1;
+  z-index: -100;
   content: url("../img/type0.svg") url("../img/type1.svg") url("../img/type2.svg") url("../img/type3.svg") url("../img/type4.svg") url("../img/type5.svg") url("../img/type6.svg") url("../img/type7.svg") url("../img/type8.svg") url("../img/mine.svg") url("../img/mine_red.svg") url("../img/mine_wrong.svg") url("../img/flag.svg");
 }
 
