@@ -341,6 +341,7 @@ function opencell(sid){
       n = 11;
     }
     cell.classList.remove('check');
+    cell.classList.remove('flag');
     cell.classList.remove('closed');
     cell.classList.add('type' + n);
     checked++;
