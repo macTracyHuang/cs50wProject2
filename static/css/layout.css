@@ -1,0 +1,16 @@
+main>.container {
+  margin-top: 15vh;
+}
+
+.navbar-brand {
+  padding: 0 !important;
+}
+
+.bg-fix {
+  background-color: #242424;
+}
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  background:aliceblue;
+}

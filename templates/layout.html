@@ -14,38 +14,23 @@
       {
       % endblock %
     }
-
-    main>.container {
-      margin-top: 15vh;
-    }
-
-    .navbar-brand {
-      padding: 0 !important;
-    }
-
-    #dogs {
-      max-width: 230px;
-      max-height: 95px;
-      width: auto;
-      height: auto;
-      position: fixed;
-      right: 0px;
-      bottom: 0px;
-    }
   </style>
+  <!-- google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <!-- Favicons -->
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
   <!-- Custom styles for this template -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
   {%block css %}{%endblock%}
 </head>
 
 <body class="d-flex flex-column h-100">
   <header>
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
-      <a class="navbar-brand" href="/"><img src="{{url_for('static',filename="img/Sugoi.png")}}" width="50" height="40" alt="Sugoi"></a>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-fix">
+      <a class="navbar-brand" href="/"><img src="{{url_for('static',filename="img/brand.png")}}" width="40" height="40" alt="Sugoi"></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -98,12 +83,9 @@
 
     </div>
   </main>
-  <footer class="footer bg-primary mt-auto py-3">
+  <footer class="footer bg-fix mt-auto py-3">
     <div class="container-fluid pr-0 mx-0">
       <span class="text-white">© 2020 macgradyTracy</span>
-    </div>
-    <div class="mb-0 mr-0">
-      <img class="ml-auto" id="dogs" src="{{url_for('static',filename="img/dogs.png")}}" width="20%" height="20%" alt="Sugoi&Lang">
     </div>
   </footer>
   <!--Bootstrap Scripts -->

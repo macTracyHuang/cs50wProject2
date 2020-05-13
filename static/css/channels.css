@@ -16,6 +16,7 @@
     }
     #sidebarCollapse{
       visibility: visible !important;
+
     }
     .wrapper{
       margin-left: 0 !important;
@@ -27,9 +28,11 @@ a[data-toggle="collapse"] {
     position: relative;
 }
 
-#addChannel:hover{
+#addChannel:hover, .user_pop:hover, .user_pop:focus, .user_pop:active, #pmMode{
+  background: none;
+  color:white;
   background-color:transparent !important;
-  box-shadow: 0;
+  box-shadow: none;
 }
 
 .dropdown-toggle::after {
@@ -43,16 +46,34 @@ a[data-toggle="collapse"] {
 .wrapper{
     display: flex;
     width: 80%;
+    height: 70vh;
     align-items: stretch;
     border-collapse: collapse;
 }
 
+#content{
+  height:70vh;
+}
+#navbar-content{
+  height: 10%;
+  padding: 0 1rem 0 1rem;
+}
+
+.bg-24{
+  background-color: #242424;
+}
+
+.mesgs{
+  height:90%;
+}
 .msg_history {
-  min-height:300px;
-  max-height: 300px;
+  height:93%;
   min-width: calc(80vw - 250px);
   overflow-y: auto;
   /* border: 2px solid; */
+}
+.type_msg{
+  height:7%;
 }
 
 .incoming_msg_img {
@@ -80,6 +101,16 @@ a[data-toggle="collapse"] {
   margin: 0;
   padding: 5px 10px 5px 12px;
   width: 100%;
+}
+
+.pm_msg .received_withd_msg p {
+ background: #ffcccc none repeat scroll 0 0;
+ border-radius: 3px;
+ color: #242424;
+ font-size: 14px;
+ margin: 0;
+ padding: 5px 10px 5px 12px;
+ width: 100%;
 }
 
 .outgoing_msg{ overflow:hidden; margin:26px 0 26px;}
@@ -114,12 +145,12 @@ a[data-toggle="collapse"] {
 }
 
 #sidebarCollapse{
+  padding: .275rem .75rem;
   visibility: hidden;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #fafafa;
 }
 
 p {
@@ -138,7 +169,7 @@ a, a:hover, a:focus {
 
 #sidebar {
     /* don't forget to add all the previously mentioned styles here too */
-    background: #2e47b2;
+    background: #242424;
     color: #fff;
     transition: all 0.3s;
 }
@@ -146,14 +177,14 @@ a, a:hover, a:focus {
 #sidebar .sidebar-header {
     text-align: center;
     padding: 10px;
-    background: #236ebf;
+    background: #013357;
 }
 
 #sidebar ul.components {
     padding: 20px 0;
     border-bottom: 1px solid #47748b;
     font-size: 15px;
-    max-height:200px;
+    height:60%;
     overflow:hidden;
     overflow-y:scroll;
 }

@@ -1,5 +1,6 @@
-//Popover button
-$('[data-toggle="popover"]').popover({
+
+//Popover button add channel
+$('#addChannel').popover({
 container: 'body',
 html: true,
 placement: 'bottom',
@@ -18,13 +19,137 @@ content:
   </div>
 </div>`
 });
+
 //User name
 if (!localStorage.getItem('username')){
   console.log('no name');
 };
 var cur_ch;
+var pmto;
 const username=localStorage.getItem('username');
 document.addEventListener('DOMContentLoaded', () => {
+  //Genrate msgs templates
+  function convert_msg(msg,pm){
+    if(msg.username === username){
+      const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
+      const content = template({'msg': msg.msg,'time_date':msg.time_date});
+      document.querySelector('.msg_history').innerHTML += content;
+    }
+    else{
+      if(pm === username){
+        const template = Handlebars.compile(document.querySelector('#pm_msg').innerHTML);
+        const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
+        document.querySelector('.msg_history').innerHTML += content;
+      }
+      else if (pm === 'undefined'){
+        const template = Handlebars.compile(document.querySelector('#in_msg').innerHTML);
+        const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
+        document.querySelector('.msg_history').innerHTML += content;
+      }
+      if (msg.username !== 'Admin'){
+        //set user_pop
+        setTimeout(() =>{
+          //Popover button user_pop
+          $('.pop_'+msg.username).each(function () {
+            $(this).popover({
+            container: 'body',
+            html: true,
+            placement: 'right',
+            sanitize: false,
+            content:
+            `<div>
+              <button type="button" class="btn btn-sm private_game">Play Game</button>
+              <button type="button" class="btn btn-sm private_msg">Private Msg</button>
+            </div>
+            `
+            });
+          })
+        }, 10);
+        setTimeout(()=>{
+          $('.pop_'+msg.username).each(function () {
+            const button = $(this);
+            button.on('shown.bs.popover', function () {
+              //gamebuttion on click
+              document.querySelector('.private_game').onclick = function() {
+                const toUser = msg.username;
+                socket.emit('invite game',{'toUser':toUser,'fromUser':username});
+                console.log('invite game '+toUser);
+                button.popover("hide");
+              };
+              //Private msg button on onclick
+              document.querySelector('.private_msg').onclick = function() {
+                pmto = msg.username;
+                document.querySelector('#pmMode').innerHTML = `Cancel`
+                document.querySelector('#pmMode').disabled = false;
+                document.querySelector('#msgHolder').placeholder = `Private msg to ${msg.username}`;
+                button.popover("hide");
+              };
+              //end private msg onclick
+              //pm mode onclick
+              document.querySelector('#pmMode').onclick = function(){
+                pmto = undefined;
+                document.querySelector('#pmMode').innerHTML = `off`
+                document.querySelector('#pmMode').disabled = true;
+                document.querySelector('#msgHolder').placeholder = `Type a message`
+              }
+            });
+          });
+        },20);
+      }
+
+    }
+  }
+
+  function load_msg(channel){
+    const ch = channel
+    document.querySelector('#currentCh').innerHTML = ch;
+    //load messages of a channels
+    //try get from server via Ajax
+    const request = new XMLHttpRequest();
+    request.open('POST', "/loadmsg");
+    // Callback function for when request completes
+    request.onload = () => {
+      const data = JSON.parse(request.responseText);
+      if (data.success){
+        clear_content();
+        const msgs = data.msgs;
+        // loop through a dic using for/of instead of for/in
+        for (let msg of msgs) {
+          convert_msg(msg,data.pmto);
+        }
+        document.querySelector('.msg_history').scrollTop = document.querySelector('.msg_history').scrollHeight;
+      }
+      else{
+        return false;
+      }
+    }
+    // Add data to send with request
+    const data = new FormData();
+    data.append('ch', ch);
+    //send request
+    request.send(data);
+    cur_ch=ch;
+    localStorage.setItem('last_ch',ch);
+    console.log("load msgs");
+  }
+  //update channel onclick.
+  function update_onclick(){
+    //Switch to another Channel
+    document.querySelectorAll('.channel').forEach(button => {
+      button.onclick = () => {
+        const ch = button.getAttribute('id');
+        cur_ch=ch
+        localStorage.setItem('last_ch',cur_ch);
+        load_msg(ch);
+      };
+    });
+  }
+
+  //Clear msg_history
+  function clear_content(){
+    document.querySelector('.msg_history').innerHTML = '';
+  }
+
   //Initilize channel list onclick attribute
   update_onclick()
   //Initialize Current channel
@@ -44,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
       $('#sidebar').toggleClass('active');
   });
   document.querySelector('#username').insertAdjacentHTML('beforeend', username);
+
   //SocketIO
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -56,16 +182,22 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(error);
   });
   // When a new channel is created, emit it to the server
-  $("[data-toggle='popover']").on('shown.bs.popover', () => {
+  $("#addChannel").on('shown.bs.popover', () => {
     document.querySelector('#addon1').onclick = () => {
-      const chName = document.querySelector('#chName').value;
-      socket.emit('create channel', {'chName': chName});
-      $('[data-toggle="popover"]').popover("hide");
+      const chName = document.querySelector('#chName').value.trim();
+      if(chName === ""){
+        alert('channel name is empty');
+      }
+      else{
+        socket.emit('create channel', {'chName': chName});
+      }
+      $('#addChannel').popover("hide");
     };
   });
-  
+
   // When a new channel is announced, add to the unordered list
   socket.on('new channel', chName => {
+      console.log('new channel');
       const template = Handlebars.compile(document.querySelector('#aChannel').innerHTML);
       const content = template({'chName': chName});
       document.querySelector('#chList').innerHTML += content;
@@ -84,81 +216,61 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   //When a message is sent, emit it to the server
   document.querySelector('.msg_send_btn').onclick = () => {
+    if(pmto===undefined){
+      pmto = 'undefined';
+    }
     const msg = document.querySelector('.write_msg').value;
     document.querySelector('.write_msg').value='';
-    socket.emit('send msg',{'username':username,'msg':msg,'cur_ch':cur_ch});
+    console.log(pmto);
+    socket.emit('send msg',{'username':username,'msg':msg,'cur_ch':cur_ch,'pmto':pmto});
   }
 
   //Message announced
   socket.on('new msg', data => {
     const ch=data['ch'];
     const msg=data['newmsg'];
+    const pm = data['pmto'];
     if(ch === cur_ch){
-      convert_msg(msg);
+      console.log('new msg');
+      convert_msg(msg,pm);
     }
     document.querySelector('.msg_history').scrollTop = 9999999;
   });
 
-});
+  //receive game invitation
+  socket.on('new game', data =>{
+    const fromUser = data['fromUser'];
+    const toUser = data['toUser'];
+    if(toUser===username){
+      console.log('new game from '+ fromUser);
+      $('#gameModal .modal-body').html(`${fromUser} invites you to play a game.`);
+      $('#gameModal').modal('show');
+    }
+  });
 
-function load_msg(channel){
-  const ch = channel
-  document.querySelector('#currentCh').innerHTML = ch;
-  //load messages of a channels
-  //try get from server via Ajax
-  const request = new XMLHttpRequest();
-  request.open('POST', "/loadmsg");
-  // Callback function for when request completes
-  request.onload = () => {
-    const data = JSON.parse(request.responseText);
-    if (data.success){
-      clear_content();
-      const msgs = data.msgs;
-      // loop through a dic using for/of instead of for/in
-      for (let msg of msgs) {
-        convert_msg(msg);
-      }
-      document.querySelector('.msg_history').scrollTop = document.querySelector('.msg_history').scrollHeight;
-    }
-    else{
-      return false;
-    }
-  }
-  // Add data to send with request
-  const data = new FormData();
-  data.append('ch', ch);
-  //send request
-  request.send(data);
-  cur_ch=ch;
-  localStorage.setItem('last_ch',ch);
-  console.log("loading");
-}
-//update channel onclick.
-function update_onclick(){
-  //Switch to another Channel
-  document.querySelectorAll('.channel').forEach(button => {
-    button.onclick = () => {
-      const ch = button.getAttribute('id');
-      cur_ch=ch
-      localStorage.setItem('last_ch',cur_ch);
-      load_msg(ch);
+  $('#gameModal #gameNo').click(function(){
+    console.log(`reject game send from ${username}`);
+    socket.emit('reject game',{});
+  });
+  $('#gameModal #gameYes').click(function(){
+    console.log(`accept game send form ${username}`);
+    socket.emit('accept game',{});
+  });
+
+  //accept game Invitation
+  socket.on('yes game', data =>{
+    if (username===data.toUser | username===data.fromUser){
+      alert(data.toUser+data.fromUser);
+      window.location.replace("/game");
     };
   });
-}
-//Genrate msgs templates
-function convert_msg(msg){
-  if(msg.username === username){
-    const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
-    const content = template({'msg': msg.msg,'time_date':msg.time_date});
-    document.querySelector('.msg_history').innerHTML += content;
-  }
-  else{
-    const template = Handlebars.compile(document.querySelector('#in_msg').innerHTML);
-    const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
-    document.querySelector('.msg_history').innerHTML += content;
-  }
-}
-//Clear msg_history
-function clear_content(){
-  document.querySelector('.msg_history').innerHTML = '';
-}
+
+  //receive game Invitation rejection
+  socket.on('no game', data =>{
+    if (username===data.toUser){
+      console.info(data.fromUser+': no game');
+      alert(`${data.fromUser} rejects your invitation`);
+    };
+  });
+
+});
