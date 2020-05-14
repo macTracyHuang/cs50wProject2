@@ -103,7 +103,7 @@ a[data-toggle="collapse"] {
   width: 100%;
 }
 
-.pm_msg .received_withd_msg p {
+.pmin_msg .received_withd_msg p {
  background: #ffcccc none repeat scroll 0 0;
  border-radius: 3px;
  color: #242424;
@@ -113,7 +113,7 @@ a[data-toggle="collapse"] {
  width: 100%;
 }
 
-.outgoing_msg{ overflow:hidden; margin:26px 0 26px;}
+.outgoing_msg, .pmoutgoing_msg{ overflow:hidden; margin:26px 0 26px;}
 .sent_msg {
   float: right;
   width: 46%;
@@ -123,6 +123,15 @@ a[data-toggle="collapse"] {
  border-radius: 3px;
  font-size: 14px;
  margin: 0; color:#fff;
+ padding: 5px 10px 5px 12px;
+ width:100%;
+}
+
+.pmoutgoing_msg > .sent_msg p {
+ background: #ffcccc none repeat scroll 0 0;
+ border-radius: 3px;
+ font-size: 14px;
+ color:#242424;
  padding: 5px 10px 5px 12px;
  width:100%;
 }

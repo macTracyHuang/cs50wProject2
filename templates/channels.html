@@ -162,8 +162,8 @@ Flack-Channel
         </div>
       </div>
   </script>
-<script id="pm_msg" type="text/template">
-  <div class="pm_msg ml-1">
+<script id="pmin_msg" type="text/template">
+  <div class="pmin_msg ml-1">
         <i class="incoming_msg_img fa fa-user icon text-light"></i>
         <button type="button" class="btn user_pop btn-outline-light border-0 pop_{{username}}">{{username}}</button>
         <div class="received_msg">
@@ -174,5 +174,13 @@ Flack-Channel
         </div>
       </div>
     </script>
+<script id="pmout_msg" type="text/template">
+  <div class="pmoutgoing_msg">
+      <div class="sent_msg">
+        <p>{{msg}}</p>
+        <span class="time_date">{{time_date}}</span>
+        </div>
+      </div>
+  </script>
 {%- endraw %}
 {%endblock%}

@@ -35,7 +35,8 @@ def index():
 first_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 channels_data = ["Flack"]
 messages = {"Flack": [
-    {"username": "Admin", "msg": "Welcome to Flack", "time_date": first_time}
+    {"username": "Admin", "msg": "Welcome to Flack", "time_date": first_time,
+        'pmto': "undefined"}
     ]}
 
 
@@ -65,7 +66,7 @@ def loadmsg():
         else:
             msgs = messages[ch]
             return jsonify(
-                {"success": True, 'msgs': msgs, 'pmto': 'undefined'})
+                {"success": True, 'msgs': msgs})
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -112,9 +113,10 @@ def msg_send(data):
     logging.debug(data)
     pmto = data['pmto']
     time_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    newmsg = {'username': username, 'msg': msg, 'time_date': time_date}
+    newmsg = {
+        'username': username, 'msg': msg, 'time_date': time_date, 'pmto': pmto}
     messages[ch].append(newmsg)
-    emit("new msg", {'ch': ch, 'newmsg': newmsg, 'pmto': pmto}, broadcast=True)
+    emit("new msg", {'ch': ch, 'newmsg': newmsg}, broadcast=True)
     # can save only 100 messages per channel
     if len(messages[ch]) >= 100:
         messages[ch] = messages[ch][0:1]

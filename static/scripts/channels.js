@@ -26,77 +26,92 @@ if (!localStorage.getItem('username')){
 };
 var cur_ch;
 var pmto;
+var nameSet = new Set();
 const username=localStorage.getItem('username');
 document.addEventListener('DOMContentLoaded', () => {
   //Genrate msgs templates
-  function convert_msg(msg,pm){
+  function convert_msg(msg){
     if(msg.username === username){
-      const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
-      const content = template({'msg': msg.msg,'time_date':msg.time_date});
-      document.querySelector('.msg_history').innerHTML += content;
+      if(msg.pmto === 'undefined'){
+        const template = Handlebars.compile(document.querySelector('#out_msg').innerHTML);
+        const content = template({'msg': msg.msg,'time_date':msg.time_date});
+        document.querySelector('.msg_history').innerHTML += content;
+      }
+      else{
+        const template = Handlebars.compile(document.querySelector('#pmout_msg').innerHTML);
+        const content = template({'msg': msg.msg,'time_date':msg.time_date});
+        document.querySelector('.msg_history').innerHTML += content;
+      }
     }
     else{
-      if(pm === username){
-        const template = Handlebars.compile(document.querySelector('#pm_msg').innerHTML);
+      if(msg.pmto === username){
+        const template = Handlebars.compile(document.querySelector('#pmin_msg').innerHTML);
         const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
         document.querySelector('.msg_history').innerHTML += content;
       }
-      else if (pm === 'undefined'){
+      else if (msg.pmto === 'undefined'){
         const template = Handlebars.compile(document.querySelector('#in_msg').innerHTML);
         const content = template({'username':msg.username,'msg': msg.msg,'time_date':msg.time_date});
         document.querySelector('.msg_history').innerHTML += content;
       }
-      if (msg.username !== 'Admin'){
-        //set user_pop
-        setTimeout(() =>{
-          //Popover button user_pop
-          $('.pop_'+msg.username).each(function () {
-            $(this).popover({
-            container: 'body',
-            html: true,
-            placement: 'right',
-            sanitize: false,
-            content:
-            `<div>
-              <button type="button" class="btn btn-sm private_game">Play Game</button>
-              <button type="button" class="btn btn-sm private_msg">Private Msg</button>
-            </div>
-            `
-            });
-          })
-        }, 10);
-        setTimeout(()=>{
-          $('.pop_'+msg.username).each(function () {
-            const button = $(this);
-            button.on('shown.bs.popover', function () {
-              //gamebuttion on click
-              document.querySelector('.private_game').onclick = function() {
-                const toUser = msg.username;
-                socket.emit('invite game',{'toUser':toUser,'fromUser':username});
-                console.log('invite game '+toUser);
-                button.popover("hide");
-              };
-              //Private msg button on onclick
-              document.querySelector('.private_msg').onclick = function() {
-                pmto = msg.username;
-                document.querySelector('#pmMode').innerHTML = `Cancel`
-                document.querySelector('#pmMode').disabled = false;
-                document.querySelector('#msgHolder').placeholder = `Private msg to ${msg.username}`;
-                button.popover("hide");
-              };
-              //end private msg onclick
-              //pm mode onclick
-              document.querySelector('#pmMode').onclick = function(){
-                pmto = undefined;
-                document.querySelector('#pmMode').innerHTML = `off`
-                document.querySelector('#pmMode').disabled = true;
-                document.querySelector('#msgHolder').placeholder = `Type a message`
-              }
-            });
-          });
-        },20);
-      }
+      nameSet.add(msg.username);
+      console.log(nameSet);
+    }
+    for(let name of nameSet){
+      setPopover(name);
+    }
+  }
 
+  function setPopover(name){
+    console.log(`setpopover ${name}`);
+    if (name !== 'Admin'){
+      //set user_pop
+      setTimeout(() =>{
+        //Popover button user_pop
+        $('.pop_'+name).each(function () {
+          $(this).popover({
+          container: 'body',
+          html: true,
+          placement: 'right',
+          sanitize: false,
+          trigger: 'focus',
+          content:
+          `<div>
+            <button type="button" class="btn btn-sm private_game">Play Game</button>
+            <button type="button" class="btn btn-sm private_msg">Private Msg</button>
+          </div>
+          `
+          });
+        })
+      }, 10);
+      setTimeout(()=>{
+        $('.pop_'+name).each(function () {
+          const button = $(this);
+          button.on('shown.bs.popover', function () {
+            //gamebuttion on click
+            document.querySelector('.private_game').onclick = function() {
+              const toUser = name;
+              socket.emit('invite game',{'toUser':toUser,'fromUser':username});
+              console.log('invite game '+toUser);
+            };
+            //Private msg button on onclick
+            document.querySelector('.private_msg').onclick = function() {
+              pmto = name;
+              document.querySelector('#pmMode').innerHTML = `Cancel`
+              document.querySelector('#pmMode').disabled = false;
+              document.querySelector('#msgHolder').placeholder = `Private msg to ${name}`;
+            };
+            //end private msg onclick
+            //pm mode onclick
+            document.querySelector('#pmMode').onclick = function(){
+              pmto = undefined;
+              document.querySelector('#pmMode').innerHTML = `off`
+              document.querySelector('#pmMode').disabled = true;
+              document.querySelector('#msgHolder').placeholder = `Type a message`
+            }
+          });
+        });
+      },20);
     }
   }
 
@@ -115,8 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const msgs = data.msgs;
         // loop through a dic using for/of instead of for/in
         for (let msg of msgs) {
-          convert_msg(msg,data.pmto);
+          convert_msg(msg);
         }
+        console.log("load msgs");
         document.querySelector('.msg_history').scrollTop = document.querySelector('.msg_history').scrollHeight;
       }
       else{
@@ -130,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     request.send(data);
     cur_ch=ch;
     localStorage.setItem('last_ch',ch);
-    console.log("load msgs");
   }
   //update channel onclick.
   function update_onclick(){
@@ -229,10 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('new msg', data => {
     const ch=data['ch'];
     const msg=data['newmsg'];
-    const pm = data['pmto'];
     if(ch === cur_ch){
       console.log('new msg');
-      convert_msg(msg,pm);
+      convert_msg(msg);
     }
     document.querySelector('.msg_history').scrollTop = 9999999;
   });
