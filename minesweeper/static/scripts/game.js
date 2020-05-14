@@ -32,7 +32,7 @@ function myTimer() {
 
 //SocketIO
 // Connect to websocket
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port+'/game');
 
 // When connected, Do Something
 socket.on('connect', () => {
@@ -43,24 +43,29 @@ socket.on('error', error => {
 });
 
 document.querySelector('#invite').onclick = function() {
-  // XNOR
-  sync= (sync === false);
   if(sync){
-    restart();
-    this.innerHTML = "Cancel";
-    socket.emit('invite', {'board': board});
-    console.log('invite others');
-  }
-  else{
-    this.innerHTML = "Invite";
+    this.innerHTML = "Sync:off";
+    $('#invite').attr('disabled', true);
     socket.emit('cancel sync',{});
     console.log('cancel sync send');
+    sync= false;
   }
-  this.classList.toggle('sync');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   //Socket Listeners
+  //update clientList
+  socket.on('update client', data =>{
+    const users = data['users'];
+    const template = Handlebars.compile(document.querySelector('#aClient').innerHTML);
+    document.querySelector('#clientList').innerHTML = "";
+    for (let user of users){
+      const content = template({'client_name':user});
+      document.querySelector('#clientList').innerHTML +=content;
+      setPopover(user);
+    }
+    console.log('update client');
+  });
   //new cell
   socket.on('new open', data => {
     console.log('socket: newopen: ' + data['cell'].id + ' from: ' + data['username']);
@@ -90,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('socket: newboard: ' + data['board'].xSize + ' from: ' + data['username']);
       const fromuser = data['username'];
       const fromboard = data['board'];
-      alert(fromuser + ' invites you to play together');
       //sync
       document.querySelectorAll('.cell').forEach((item, i) => {
         item.className="";
@@ -110,19 +114,72 @@ document.addEventListener('DOMContentLoaded', function() {
     sync = newsync;
     console.log(newsync);
     if(sync){
-      invitebtn.innerHTML = "Cancel";
+      $('#invite').attr('disabled', false);
+      invitebtn.innerHTML = "Cancel Sync";
       console.log('sync receive');
     }
     else{
-      invitebtn.innerHTML = "Invite";
+      $('#invite').attr('disabled', true);
+      invitebtn.innerHTML = "Sync:off";
       console.log('cancel sync receive');
     }
     invitebtn.classList.toggle('sync');
+  });
+
+  //receive game invitation
+  socket.on('new game', data =>{
+    const fromUser = data['fromUser'];
+    const toUser = data['toUser'];
+    if(toUser===username){
+      console.log('new game from '+ fromUser);
+      $('#gameModal .modal-body').html(`${fromUser} invites you to play a game.`);
+      $('#gameModal').modal('show');
+    }
+  });
+
+  $('#gameModal #gameNo').click(function(){
+    console.log(`reject game send from ${username}`);
+    socket.emit('reject game',{});
+  });
+  $('#gameModal #gameYes').click(function(){
+    console.log(`accept game send form ${username}`);
+    sync = true;
+    let invitebtn = document.querySelector('#invite');
+    if(sync){
+      restart();
+      $('#invite').attr('disabled', false);
+      invitebtn.innerHTML = "Cancel Sync";
+    }
+    invitebtn.classList.toggle('sync');
+    socket.emit('accept game',{'board': board});
+    $('#gameModal').modal('hide');
+    console.log('play game together!');
+  });
+
+  //accept game Invitation
+  socket.on('yes game', data =>{
+    if (username===data.toUser | username===data.fromUser){
+      console.log('accept game');
+      alert(`${data.fromUser} accepts your invitation`);
+      // window.location.replace("/game");
+    };
+  });
+
+  //receive game Invitation rejection
+  socket.on('no game', data =>{
+    if (username===data.toUser){
+      console.info(data.fromUser+': no game');
+      alert(`${data.fromUser} rejects your invitation`);
+    };
   });
   //End socketlisteners
 
   //initBoard when app start
   initBoard();
+
+  //Enable navItem
+  $('#btn-chat').attr('hidden', false);
+  $('#invite').attr('disabled', true);
 });
 //End DOMContentLoaded
 
@@ -420,7 +477,7 @@ var isdown=false;
       face.classList.add('top-area-face-unpressed');
       restart();
       if(sync){
-        socket.emit('invite', {'board': board});
+        socket.emit('restart game', {'board': board});
       }
     }
   });
@@ -578,4 +635,41 @@ function restart(){
   updateMines();
   Board.randomlyAssignMines(board);
   Board.calculateNeighborMineCounts(board);
+}
+
+function setPopover(name){
+  console.log(`setpopover ${name}`);
+  if (name !== 'Admin'){
+    //set user_pop
+    setTimeout(() =>{
+      //Popover button user_pop
+      $('#pop_'+name).each(function () {
+        $(this).popover({
+        container: 'body',
+        html: true,
+        placement: 'right',
+        sanitize: false,
+        trigger: 'focus',
+        content:
+        `<div>
+          <button type="button" class="btn btn-sm private_game" id="game_${name}">Play Game</button>
+        </div>
+        `
+        });
+      })
+    }, 10);
+    setTimeout(()=>{
+      $('#pop_'+name).each(function () {
+        const button = $(this);
+        button.on('shown.bs.popover', function () {
+          //gamebuttion on click
+          document.querySelector('.private_game').onclick = function() {
+            const toUser = name;
+            socket.emit('invite game',{'toUser':toUser,'fromUser':username});
+            console.log('invite game '+toUser);
+          };
+        });
+      });
+    },20);
+  }
 }

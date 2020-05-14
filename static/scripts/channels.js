@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
           trigger: 'focus',
           content:
           `<div>
-            <button type="button" class="btn btn-sm private_game">Play Game</button>
             <button type="button" class="btn btn-sm private_msg">Private Msg</button>
           </div>
           `
@@ -88,12 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         $('.pop_'+name).each(function () {
           const button = $(this);
           button.on('shown.bs.popover', function () {
-            //gamebuttion on click
-            document.querySelector('.private_game').onclick = function() {
-              const toUser = name;
-              socket.emit('invite game',{'toUser':toUser,'fromUser':username});
-              console.log('invite game '+toUser);
-            };
             //Private msg button on onclick
             document.querySelector('.private_msg').onclick = function() {
               pmto = name;
@@ -187,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //SocketIO
   // Connect to websocket
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/channels');
 
   // When connected, Do Something
   socket.on('connect', () => {
@@ -250,41 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.querySelector('.msg_history').scrollTop = 9999999;
   });
-
-  //receive game invitation
-  socket.on('new game', data =>{
-    const fromUser = data['fromUser'];
-    const toUser = data['toUser'];
-    if(toUser===username){
-      console.log('new game from '+ fromUser);
-      $('#gameModal .modal-body').html(`${fromUser} invites you to play a game.`);
-      $('#gameModal').modal('show');
-    }
-  });
-
-  $('#gameModal #gameNo').click(function(){
-    console.log(`reject game send from ${username}`);
-    socket.emit('reject game',{});
-  });
-  $('#gameModal #gameYes').click(function(){
-    console.log(`accept game send form ${username}`);
-    socket.emit('accept game',{});
-  });
-
-  //accept game Invitation
-  socket.on('yes game', data =>{
-    if (username===data.toUser | username===data.fromUser){
-      alert(data.toUser+data.fromUser);
-      window.location.replace("/game");
-    };
-  });
-
-  //receive game Invitation rejection
-  socket.on('no game', data =>{
-    if (username===data.toUser){
-      console.info(data.fromUser+': no game');
-      alert(`${data.fromUser} rejects your invitation`);
-    };
-  });
-
+  //enable link
+  $('#btn-game').attr('hidden', false);
 });

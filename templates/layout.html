@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <title>{% block title %}{% endblock %}</title>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul class=flashes>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
   <style>
     {
       % block astyle %
@@ -39,9 +48,11 @@
           <li class="nav-item active">
             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
+          {%block navItem%}
+          <!-- <li class="nav-item" id="nav-game">
             <a class="nav-link" href="{{url_for('minesweeper.index')}}">Game</a>
-          </li>
+          </li> -->
+          {%endblock%}
         </ul>
         <!-- <ul class="navbar-nav ml-auto">
           {% if session.user_id %}

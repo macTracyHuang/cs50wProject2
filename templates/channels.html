@@ -12,6 +12,11 @@ Flack-Channel
 <link rel="stylesheet" href="{{url_for('static',filename="css/channels.css")}}">
 </link>
 {%endblock%}
+{%block navItem%}
+<li class="nav-item" id="nav-game">
+  <a class="nav-link" href="{{url_for('minesweeper.index')}}" id="btn-game" hidden="true">Game</a>
+</li>
+{%endblock%}
 <!-- Main Content -->
 {% block content %}
 <div class="wrapper mx-auto">

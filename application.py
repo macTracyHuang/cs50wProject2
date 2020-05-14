@@ -25,10 +25,18 @@ def login_required(f):
     return decorated_function
 
 
+currentusers = set()
 @app.route("/")
 # @login_required
 def index():
     return render_template("index.html")
+
+
+@app.route("/users")
+def users():
+    if request.method == 'GET':
+        logging.debug(currentusers)
+        return jsonify({'success': True, 'users': list(currentusers)})
 
 
 # store data
@@ -44,7 +52,11 @@ messages = {"Flack": [
 # @login_required
 def channels():
     if request.method == "GET":
-        return redirect(url_for('index'))
+        username = session['username']
+        ch = 'Flack'
+        return render_template(
+            'channels.html', channels=channels_data,
+            messages=messages[ch], username=username)
     elif request.method == "POST":
         username = request.form.get('username')
         session['username'] = username
@@ -90,7 +102,19 @@ def login():
         return render_template("index.html")
 
 # Socket
-@socketio.on("create channel")
+@socketio.on('connect', namespace='/channels')
+def channels_connect():
+    logging.info(session['username'] + ' Connected to Channels')
+    currentusers.add(session['username'])
+
+
+@socketio.on('disconnect', namespace='/channels')
+def channels_disconnect():
+    logging.info(session['username'] + ' Disconnected from Channels')
+    currentusers.remove(session['username'])
+
+
+@socketio.on("create channel", namespace='/channels')
 def createCh(data):
     chName = data["chName"]
     if chName in channels_data:
@@ -105,7 +129,7 @@ def createCh(data):
         emit("new channel", chName, broadcast=True)
 
 
-@socketio.on("send msg")
+@socketio.on("send msg", namespace='/channels')
 def msg_send(data):
     ch = data['cur_ch']
     username = data['username']
@@ -120,50 +144,6 @@ def msg_send(data):
     # can save only 100 messages per channel
     if len(messages[ch]) >= 100:
         messages[ch] = messages[ch][0:1]
-
-
-class Game:
-    def __init__(self, fromUser, toUser):
-        self.fromUser = fromUser
-        self.toUser = toUser
-        logging.info('new game object' + fromUser + toUser)
-
-    def invite(self):
-        logging.debug(self.fromUser + ' invite ' + self.toUser)
-        emit(
-            "new game",
-            {'toUser': self.toUser, 'fromUser': self.fromUser},
-            broadcast=True, include_self=False)
-
-    def reject(self):
-        emit(
-            "no game",
-            {'toUser': self.fromUser, 'fromUser': self.toUser},
-            broadcast=True, include_self=False
-            )
-
-    def accept(self):
-        emit(
-            "yes game",
-            {'toUser': self.fromUser, 'fromUser': self.toUser},
-            broadcast=True)
-
-
-@socketio.on("invite game")
-def new_game(data):
-    logging.debug('new game invitation')
-    fromUser = data['fromUser']
-    toUser = data['toUser']
-    newgame = Game(fromUser, toUser)
-    newgame.invite()
-
-    @socketio.on("reject game")
-    def reject_game(data):
-        newgame.reject()
-
-    @socketio.on("accept game")
-    def accept_game(data):
-        newgame.accept()
 
 
 if __name__ == '__main__':
