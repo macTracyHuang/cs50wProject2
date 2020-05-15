@@ -5,78 +5,88 @@ var board;
 var time;
 var checked = 0;
 var downid;
-var first=true;
+var first = true;
 var timerid = [];
-var sync =false;
+var sync = false;
 var room;
+var sid;
 
 //Get User name
-if (!localStorage.getItem('username')){
+if (!localStorage.getItem('username')) {
   console.log('no name');
 };
-const username=localStorage.getItem('username');
+const username = localStorage.getItem('username');
 
-function startTime(){
+function startTime() {
+  stopTime();
   timerid.push(setInterval(myTimer, 1000));
 }
-function stopTime(){
+
+function stopTime() {
   console.log('stoptime');
-  for (let t in timerid){
+  for (let t in timerid) {
     clearInterval(timerid);
   }
   timerid = [];
-  updateTime();
 }
+
 function myTimer() {
-  time+=1;
-  if(time<=999){
+  time += 1;
+  if (time <= 999) {
     updateTime();
   }
 }
 
 function getRandomid(length) {
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 //SocketIO
 // Connect to websocket
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port+'/game');
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/game', {
+  query: 'username=' + username
+});
 
 // When connected, Do Something
 socket.on('connect', () => {
   room = socket.id;
+  sid = socket.id;
 });
 //Error Listener
 socket.on('error', error => {
-    alert(error);
+  alert(error);
 });
 
 document.querySelector('#invite').onclick = function() {
-  if(sync){
+  if (sync) {
     this.innerHTML = "Sync:off";
     $('#invite').attr('disabled', true);
     console.log('cancel sync send');
-    socket.emit('cancel sync', {'fromUser': username});
-    sync= false;
+    socket.emit('cancel sync', {
+      'fromUser': username, 'roomid': room
+    });
+    sync = false;
   }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   //Socket Listeners
   //update clientList
-  socket.on('update client', data =>{
+  socket.on('update client', data => {
     const users = data['users'];
     const template = Handlebars.compile(document.querySelector('#aClient').innerHTML);
     document.querySelector('#clientList').innerHTML = "";
-    for (let user of users){
-      const content = template({'client_name':user});
-      document.querySelector('#clientList').innerHTML +=content;
+    for (let user of users) {
+      const content = template({
+        'client_name': user
+      });
+      document.querySelector('#clientList').innerHTML += content;
       setPopover(user);
     }
     console.log('update client');
@@ -94,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('new flag', data => {
     const fromcell = data['cell'];
     //flag cell locally
-    let htmlcell=document.querySelector('#'+fromcell.id);
+    let htmlcell = document.querySelector('#' + fromcell.id);
     console.log('socket: newflag: ' + data['cell'].id + ' from: ' + data['username']);
     flagcell(htmlcell);
   });
@@ -103,37 +113,38 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('update board received');
     checked = 0;
     mines = startmines;
-    first=true;
+    first = true;
     gameover = false;
     time = 0;
-    if(sync){
+    updateTime();
+    stopTime();
+    if (sync) {
       console.log('socket: newboard: ' + data['board'].xSize + ' from: ' + data['username']);
       const fromuser = data['username'];
       const fromboard = data['board'];
       //sync
       document.querySelectorAll('.cell').forEach((item, i) => {
-        item.className="";
+        item.className = "";
         item.classList.add('cell', 'closed');
       });
       board = fromboard;
       let face = document.querySelector('#top_area_face')
-      face.className="";
-      face.classList.add('top-area-face','top-area-face-unpressed');
+      face.className = "";
+      face.classList.add('top-area-face', 'top-area-face-unpressed');
     }
   });
 
   //update sync
-  socket.on('update sync', data =>{
+  socket.on('update sync', data => {
     let newsync = data['sync'];
-    let invitebtn =document.querySelector('#invite');
+    let invitebtn = document.querySelector('#invite');
     sync = newsync;
     console.log(newsync);
-    if(sync){
+    if (sync) {
       $('#invite').attr('disabled', false);
       invitebtn.innerHTML = "Cancel Sync";
       console.log('sync receive');
-    }
-    else{
+    } else {
       $('#invite').attr('disabled', true);
       invitebtn.innerHTML = "Sync:off";
       console.log('cancel sync receive');
@@ -142,53 +153,54 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   //update roomid
-  socket.on('update roomid', data =>{
-    console.log('try update roomid toUser: '+data['toUser']);
-    if (username === data['fromUser'] | username ===data['toUser']){
-      console.log('updating: '+data['roomid']+' socketid: '+socket.id)
-      if (data['roomid'] === 'df'){
+  socket.on('update roomid', data => {
+    console.log('try update roomid toUser: ' + data['toUser']);
+    if (username === data['fromUser'] | username === data['toUser']) {
+      console.log('updating: ' + data['roomid'] + ' socketid: ' + socket.id)
+      if (data['roomid'] === 'df') {
         room = socket.id
-      }
-      else {
+      } else {
         room = data['roomid'];
       }
     }
   });
 
   //receive game invitation
-  socket.on('new game', data =>{
+  socket.on('new game', data => {
     const fromUser = data['fromUser'];
     const toUser = data['toUser'];
-    console.log('new game receive '+ fromUser);
-    if(toUser===username){
-      console.log('new game from '+ fromUser);
+    console.log('new game receive ' + fromUser);
+    if (toUser === username) {
+      console.log('new game from ' + fromUser);
       $('#gameModal .modal-body').html(`${fromUser} invites you to play a game.`);
       $('#gameModal').modal('show');
     }
   });
 
-  $('#gameModal #gameNo').click(function(){
+  $('#gameModal #gameNo').click(function() {
     console.log(`reject game send from ${username}`);
-    socket.emit('reject game',{});
+    socket.emit('reject game', {'roomid':room});
   });
-  $('#gameModal #gameYes').click(function(){
+  $('#gameModal #gameYes').click(function() {
     console.log(`accept game send form ${username}`);
     sync = true;
     let invitebtn = document.querySelector('#invite');
-    if(sync){
+    if (sync) {
       restart();
       $('#invite').attr('disabled', false);
       invitebtn.innerHTML = "Cancel Sync";
     }
     invitebtn.classList.toggle('sync');
-    socket.emit('accept game',{'board': board});
+    socket.emit('accept game', {
+      'board': board,'roomid':room
+    });
     $('#gameModal').modal('hide');
     console.log('play game together!');
   });
 
   //accept game Invitation
-  socket.on('yes game', data =>{
-    if (username===data.toUser | username===data.fromUser){
+  socket.on('yes game', data => {
+    if (username === data.toUser | username === data.fromUser) {
       console.log('accept game');
       alert(`${data.fromUser} accepts your invitation`);
       // window.location.replace("/game");
@@ -196,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   //receive game Invitation rejection
-  socket.on('no game', data =>{
-    if (username===data.toUser){
-      console.info(data.fromUser+': no game');
+  socket.on('no game', data => {
+    if (username === data.toUser) {
+      console.info(data.fromUser + ': no game');
       alert(`${data.fromUser} rejects your invitation`);
     };
   });
@@ -343,7 +355,7 @@ function getNeighbors(cell, xSize, ySize) {
 function initBoard() {
   const template = Handlebars.compile(document.querySelector('#aCell').innerHTML);
   const newBoard = new Board(30, 16, startmines);
-  first=true;
+  first = true;
   gameover = false;
   mines = startmines;
   board = newBoard;
@@ -365,92 +377,89 @@ function initBoard() {
     document.querySelector('#A4').innerHTML += clear;
   }
 
-//handle cell event
-var isdown=false;
+  //handle cell event
+  var isdown = false;
   document.querySelectorAll('.cell').forEach(cell => {
     const id = cell.id;
     //One click
     cell.addEventListener('mousedown', event => {
-      if(first){
+      if (first) {
         startTime();
-        first=false;
+        first = false;
       }
-      if(!gameover && event.button === 0 &&!board.cells[id].flagged){
-        downid=id;
-        isdown=true;
-        if(board.cells[id].opened){
+      if (!gameover && event.button === 0 && !board.cells[id].flagged) {
+        downid = id;
+        isdown = true;
+        if (board.cells[id].opened) {
           const neighbors = getNeighbors(board.cells[id], 30, 16);
-          for (let neighbor of neighbors){
-            let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('closed') && !n.classList.contains('flag')){
+          for (let neighbor of neighbors) {
+            let n = document.querySelector('#' + neighbor);
+            if (n.classList.contains('closed') && !n.classList.contains('flag')) {
               n.classList.remove('closed');
               n.classList.add('check');
             }
           }
-        }
-        else{
-          document.querySelector('#'+id).classList.remove('closed');
-          document.querySelector('#'+id).classList.add('check');
+        } else {
+          document.querySelector('#' + id).classList.remove('closed');
+          document.querySelector('#' + id).classList.add('check');
         }
       }
     });
 
     cell.addEventListener('mouseover', e => {
-      if(isdown&&downid!==id&&e.button===0){
-        if(board.cells[downid].opened){
+      if (isdown && downid !== id && e.button === 0) {
+        if (board.cells[downid].opened) {
           const neighbors = getNeighbors(board.cells[downid], 30, 16);
-          for (let neighbor of neighbors){
-            let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('check')&&!n.classList.contains('flag')){
+          for (let neighbor of neighbors) {
+            let n = document.querySelector('#' + neighbor);
+            if (n.classList.contains('check') && !n.classList.contains('flag')) {
               n.classList.toggle('closed');
               n.classList.toggle('check');
             }
           }
-        }
-        else{
-          document.querySelector('#'+downid).classList.toggle('closed');
-          document.querySelector('#'+downid).classList.toggle('check');
+        } else {
+          document.querySelector('#' + downid).classList.toggle('closed');
+          document.querySelector('#' + downid).classList.toggle('check');
         }
 
-        if(board.cells[id].opened){
+        if (board.cells[id].opened) {
           const neighbors = getNeighbors(board.cells[id], 30, 16);
-          for (let neighbor of neighbors){
-            let n = document.querySelector('#'+neighbor);
-            if(n.classList.contains('closed')&&!n.classList.contains('flag')){
+          for (let neighbor of neighbors) {
+            let n = document.querySelector('#' + neighbor);
+            if (n.classList.contains('closed') && !n.classList.contains('flag')) {
               n.classList.toggle('closed');
               n.classList.toggle('check');
             }
           }
+        } else {
+          document.querySelector('#' + id).classList.toggle('closed');
+          document.querySelector('#' + id).classList.toggle('check');
         }
-        else{
-          document.querySelector('#'+id).classList.toggle('closed');
-          document.querySelector('#'+id).classList.toggle('check');
-        }
-        downid=id;
+        downid = id;
       }
     });
 
     cell.addEventListener('mouseup', event => {
-      if(!gameover && isdown && event.button === 0){
+      if (!gameover && isdown && event.button === 0) {
         const neighbors = getNeighbors(board.cells[downid], 30, 16);
-        for (let neighbor of neighbors){
-          let n = document.querySelector('#'+neighbor);
-          if(!board.cells[neighbor].opened&&!n.classList.contains('flag')){
+        for (let neighbor of neighbors) {
+          let n = document.querySelector('#' + neighbor);
+          if (!board.cells[neighbor].opened && !n.classList.contains('flag')) {
             n.classList.add('closed');
             n.classList.remove('check');
           }
         }
       }
-      if (!gameover &&isdown && !board.cells[id].opened && event.button === 0) {
+      if (!gameover && isdown && !board.cells[id].opened && event.button === 0) {
         opencell(id);
-        if (sync){
-        //update to other users
-        socket.emit('open cell', {
-          'cell': board.cells[id]
-        });
+        if (sync) {
+          //update to other users
+          socket.emit('open cell', {
+            'cell': board.cells[id], 'roomid':room
+          });
         }
       }
-      isdown=false;
+      isdown = false;
     });
     //Double Click
     cell.addEventListener('dblclick', event => {
@@ -464,14 +473,14 @@ var isdown=false;
           for (let neighbor of neighbors) {
             if (!board.cells[neighbor].flagged) {
               setTimeout(function() {
-                downid=id;
+                downid = id;
                 opencell(neighbor);
-                if (sync){
-                //update to other users
-                socket.emit('open cell', {
-                  'cell': board.cells[neighbor]
-                });
-                console.log('double emit');
+                if (sync) {
+                  //update to other users
+                  socket.emit('open cell', {
+                    'cell': board.cells[neighbor],'roomid':room
+                  });
+                  console.log('double emit');
                 }
               }, 3);
             }
@@ -482,10 +491,12 @@ var isdown=false;
     //Right click
     cell.addEventListener('contextmenu', e => {
       flagcell(cell);
-      if (sync){
-        socket.emit('flag cell',{'cell':board.cells[cell.id]});
+      if (sync) {
+        socket.emit('flag cell', {
+          'cell': board.cells[cell.id],'roomid':room
+        });
       }
-      isdown=false;
+      isdown = false;
       e.preventDefault();
     });
   });
@@ -493,7 +504,7 @@ var isdown=false;
   //When top area face is click
   let face = document.querySelector('#top_area_face');
   face.addEventListener('mousedown', event => {
-    if(event.button===0){
+    if (event.button === 0) {
       face.classList.remove('top-area-face-unpressed');
       face.classList.remove('top-area-face-lose');
       face.classList.remove('top-area-face-win');
@@ -501,33 +512,35 @@ var isdown=false;
     }
   });
   face.addEventListener('mouseup', event => {
-    if(event.button===0){
+    if (event.button === 0) {
       face.classList.toggle('top-area-face-pressed');
       face.classList.add('top-area-face-unpressed');
       restart();
-      if(sync){
-        socket.emit('restart game', {'board': board});
+      if (sync) {
+        socket.emit('restart game', {
+          'board': board,'roomid':room
+        });
       }
     }
   });
 }
 
-function opencell(sid){
-  if(!gameover&&!board.cells[sid].opened){
-    if(sync && first){
+function opencell(sid) {
+  if (!gameover && !board.cells[sid].opened) {
+    if (sync && first) {
       startTime();
-      first=false;
+      first = false;
     }
-    const cell = document.querySelector('#'+sid);
+    const cell = document.querySelector('#' + sid);
     const neighbors = getNeighbors(board.cells[sid], 30, 16);
     // const x = cell.getAttribute("data-x");
     // const y = cell.getAttribute("data-y");
     let n = board.cells[sid].neighbor;
     if (n === 0) {
       for (let neighbor of neighbors) {
-        if(!board.cells[neighbor].opened){
+        if (!board.cells[neighbor].opened) {
           setTimeout(function() {
-            downid=sid;
+            downid = sid;
             opencell(neighbor);
           }, 3);
         }
@@ -571,7 +584,7 @@ function opencell(sid){
             innercell.classList.remove('flag');
           }
           //others
-          else{
+          else {
             innercell.classList.remove('closed');
           }
           innercell.classList.add('type' + n);
@@ -583,7 +596,7 @@ function opencell(sid){
 }
 
 //flag cell
-function flagcell(cell){
+function flagcell(cell) {
   if (!gameover) {
     if (!board.cells[cell.id].opened) {
       cell.classList.toggle('closed');
@@ -621,6 +634,7 @@ function updateMines() {
   document.querySelector('#top_area_mines_1').className = "";
   document.querySelector('#top_area_mines_1').classList.add('top-area-num', 'pull-left', 'top-area-num' + mines_1);
 }
+
 function updateTime() {
   let t = time;
   let s = [];
@@ -639,16 +653,17 @@ function updateTime() {
   document.querySelector('#top_area_time_1').classList.add('top-area-num', 'pull-left', 'top-area-num' + time_1);
 }
 
-function restart(){
+function restart() {
   let face = document.querySelector('#top_area_face');
-  face.className="";
-  face.classList.add('top-area-face','top-area-face-unpressed');
+  face.className = "";
+  face.classList.add('top-area-face', 'top-area-face-unpressed');
   //restart game
   checked = 0;
   mines = startmines;
-  first=true;
+  first = true;
   gameover = false;
   time = 0;
+  updateTime();
   stopTime();
   for (let x = 0; x < board.xSize; x++) {
     for (let y = 0; y < board.ySize; y++) {
@@ -666,38 +681,43 @@ function restart(){
   Board.calculateNeighborMineCounts(board);
 }
 
-function setPopover(name){
+function setPopover(name) {
   console.log(`setpopover ${name}`);
-  if (name !== 'Admin'){
+  if (name !== 'Admin') {
     //set user_pop
-    setTimeout(() =>{
+    setTimeout(() => {
       //Popover button user_pop
-      $('#pop_'+name).each(function () {
+      $('#pop_' + name).each(function() {
         $(this).popover({
-        container: 'body',
-        html: true,
-        placement: 'left',
-        sanitize: false,
-        trigger: 'focus',
-        content:
-        `<button type="button" class="btn btn-sm private_game popover-content" id="game_${name}">Play Game</button>
+          container: 'body',
+          html: true,
+          placement: 'left',
+          sanitize: false,
+          trigger: 'focus',
+          content: `<button type="button" class="btn btn-sm private_game popover-content" id="game_${name}">Play Game</button>
         `
         });
       })
     }, 10);
-    setTimeout(()=>{
-      $('#pop_'+name).each(function () {
+    setTimeout(() => {
+      $('#pop_' + name).each(function() {
         const button = $(this);
-        button.on('shown.bs.popover', function () {
+        button.on('shown.bs.popover', function() {
           //gamebuttion on click
           document.querySelector('.private_game').onclick = function() {
-            const toUser = name;
-            const roomid = getRandomid(5);
-            socket.emit('invite game',{'toUser':toUser,'fromUser':username,'roomid':roomid});
-            console.log('invite game '+toUser+' id:'+roomid);
+            if (sync) {
+              alert('Cancel Sync before inviting others');
+            } else {
+              const toUser = name;
+              socket.emit('invite game', {
+                'toUser': toUser,
+                'fromUser': username,'roomid':room
+              });
+              console.log('invite game ' + toUser);
+            }
           };
         });
       });
-    },20);
+    }, 20);
   }
 }
