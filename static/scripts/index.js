@@ -1,4 +1,4 @@
-var users;
+var users = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   //Check name exists
