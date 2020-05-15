@@ -237,3 +237,11 @@ body::after{
 .clear {
   clear: both;
 }
+
+/* Popover Body */
+.popover{
+    height: 45px;
+}
+.popover-content{
+    font-size: 18px;
+}

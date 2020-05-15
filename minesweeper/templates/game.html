@@ -20,7 +20,10 @@ Game
 <!-- Main Content -->
 {% block content %}
 <div class="col-lg-2">
-  <h3 id="username">Hello {{username}}</h3>
+  <h3 id="username">Hello, {{username}}</h3>
+</div>
+<div class="" id="best_score">
+  Best Score: {{bestScore}} : by {{bestUser}}
 </div>
 <div class="container mt-1">
   <div class="row justify-content-center">
@@ -95,7 +98,10 @@ Game
       </div>
     </div>
     <div class="col-lg-2 border offset-lg-1 shadow-sm bg-light">
-      <ul class="list-unstyled" id="clientList">
+      <div class="text-info border-bottom w-100 text-center">
+        Online Players
+      </div>
+      <ul class="list-unstyled overflow-auto text-center" id="clientList">
       </ul>
     </div>
   </div>
@@ -141,8 +147,8 @@ Game
   </div>
 </script>
 <script id="aClient" type="text/template">
-  <li id="{{client_name}}" class="">
-    <button type="button" class="btn btn-sm user_pop border-0" id="pop_{{client_name}}">{{client_name}}</button>
+  <li id="{{client_name}}" class="inline-block">
+    <button type="button" class="btn user_pop border-0" id="pop_{{client_name}}">{{client_name}}</button>
   </li>
 </script>
 {%- endraw %}

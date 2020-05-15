@@ -6,8 +6,9 @@ var time;
 var checked = 0;
 var downid;
 var first=true;
-var timerid;
+var timerid = [];
 var sync =false;
+var room;
 
 //Get User name
 if (!localStorage.getItem('username')){
@@ -16,11 +17,14 @@ if (!localStorage.getItem('username')){
 const username=localStorage.getItem('username');
 
 function startTime(){
-  timerid = setInterval(myTimer, 1000);
+  timerid.push(setInterval(myTimer, 1000));
 }
 function stopTime(){
   console.log('stoptime');
-  clearInterval(timerid);
+  for (let t in timerid){
+    clearInterval(timerid);
+  }
+  timerid = [];
   updateTime();
 }
 function myTimer() {
@@ -30,12 +34,23 @@ function myTimer() {
   }
 }
 
+function getRandomid(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
 //SocketIO
 // Connect to websocket
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port+'/game');
 
 // When connected, Do Something
 socket.on('connect', () => {
+  room = socket.id;
 });
 //Error Listener
 socket.on('error', error => {
@@ -46,8 +61,8 @@ document.querySelector('#invite').onclick = function() {
   if(sync){
     this.innerHTML = "Sync:off";
     $('#invite').attr('disabled', true);
-    socket.emit('cancel sync',{});
     console.log('cancel sync send');
+    socket.emit('cancel sync', {'fromUser': username});
     sync= false;
   }
 }
@@ -126,10 +141,25 @@ document.addEventListener('DOMContentLoaded', function() {
     invitebtn.classList.toggle('sync');
   });
 
+  //update roomid
+  socket.on('update roomid', data =>{
+    console.log('try update roomid toUser: '+data['toUser']);
+    if (username === data['fromUser'] | username ===data['toUser']){
+      console.log('updating: '+data['roomid']+' socketid: '+socket.id)
+      if (data['roomid'] === 'df'){
+        room = socket.id
+      }
+      else {
+        room = data['roomid'];
+      }
+    }
+  });
+
   //receive game invitation
   socket.on('new game', data =>{
     const fromUser = data['fromUser'];
     const toUser = data['toUser'];
+    console.log('new game receive '+ fromUser);
     if(toUser===username){
       console.log('new game from '+ fromUser);
       $('#gameModal .modal-body').html(`${fromUser} invites you to play a game.`);
@@ -418,7 +448,6 @@ var isdown=false;
         socket.emit('open cell', {
           'cell': board.cells[id]
         });
-        console.log('double emit');
         }
       }
       isdown=false;
@@ -647,13 +676,11 @@ function setPopover(name){
         $(this).popover({
         container: 'body',
         html: true,
-        placement: 'right',
+        placement: 'left',
         sanitize: false,
         trigger: 'focus',
         content:
-        `<div>
-          <button type="button" class="btn btn-sm private_game" id="game_${name}">Play Game</button>
-        </div>
+        `<button type="button" class="btn btn-sm private_game popover-content" id="game_${name}">Play Game</button>
         `
         });
       })
@@ -665,8 +692,9 @@ function setPopover(name){
           //gamebuttion on click
           document.querySelector('.private_game').onclick = function() {
             const toUser = name;
-            socket.emit('invite game',{'toUser':toUser,'fromUser':username});
-            console.log('invite game '+toUser);
+            const roomid = getRandomid(5);
+            socket.emit('invite game',{'toUser':toUser,'fromUser':username,'roomid':roomid});
+            console.log('invite game '+toUser+' id:'+roomid);
           };
         });
       });
