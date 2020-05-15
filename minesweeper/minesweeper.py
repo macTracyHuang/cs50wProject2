@@ -178,10 +178,16 @@ class Game:
             broadcast=True, room=self.room
             )
         logging.info('emit ud sync')
-        if users.get(self.fromUser) is None:
+        if users.get(self.fromUser) is None and \
+                users.get(self.toUser) is not None:
             msg = self.fromUser + 'is disconnected'
+            ingame.remove(self.toUser)
+            leave_room(self.room, self.toSid)
             emit('error', msg)
-        elif users.get(self.toUser) is None:
+        elif users.get(self.toUser) is None and \
+                users.get(self.fromUser) is not None:
+            ingame.remove(self.fromUser)
+            leave_room(self.room, self.fromSid)
             msg = self.toUser + 'is disconnected'
             emit('error', msg)
         else:
