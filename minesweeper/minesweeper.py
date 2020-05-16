@@ -35,7 +35,7 @@ def index():
             newuser = User(username=username, score="999")
             db.session.add(newuser)
             db.session.commit()
-        best = db.session.query(User).order_by(User.score.desc()).first()
+        best = db.session.query(User).order_by(User.score.asc()).first()
         global bestScore
         global bestUser
         bestScore = best.score
