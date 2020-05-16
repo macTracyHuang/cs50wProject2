@@ -242,4 +242,8 @@ body::after {
   font-size: 18px;
 }
 
+.footer{
+  min-width: 786px;
+}
+
 /*# sourceMappingURL=game.css.map */
