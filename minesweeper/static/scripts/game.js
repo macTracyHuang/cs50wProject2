@@ -1,4 +1,4 @@
-const startmines = 5;
+const startmines = 99;
 var mines;
 var gameover;
 var board;
