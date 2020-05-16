@@ -124,8 +124,10 @@ def createCh(data):
         channels_data.append(chName)
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         messages[chName] = [{
-            "username": "Admin", "msg": chName+" Created", "time_date": time
+            "username": "Admin", "msg": chName+" Created", "time_date": time,
+            'pmto': "undefined"
             }]
+        logging.info(str(messages[chName]))
         emit("new channel", chName, broadcast=True)
 
 
