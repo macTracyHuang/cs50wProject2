@@ -5,6 +5,7 @@ from setup import socketio
 import logging
 import random
 import string
+from models import User, db
 
 bp = Blueprint('minesweeper', __name__, static_folder='static',
                template_folder='templates')
@@ -27,9 +28,24 @@ def index():
             flash(username + ' is Playing')
         return redirect(url_for('index'))
     else:
+        # check if user in db
+        dbuser = db.session.query(User).\
+            filter_by(username=session.get('username')).first()
+        if dbuser is None:
+            newuser = User(username=username, score="999")
+            db.session.add(newuser)
+            db.session.commit()
+        best = db.session.query(User).order_by(User.score.desc()).first()
+        global bestScore
+        global bestUser
+        bestScore = best.score
+        bestUser = best.username
+        usersc = db.session.query(User).\
+            filter_by(username=session.get('username')).first().score
         return render_template(
             'game.html',
-            username=username, bestScore=bestScore, bestUser=bestUser)
+            username=username, bestScore=bestScore, bestUser=bestUser,
+            usersc=usersc)
 
 
 @bp.route("/users")
@@ -275,6 +291,24 @@ def cancel(data):
     game = games.get(data['roomid'])
     logging.info('cancel sync receive')
     game.cancelsync(data)
+
+
+@socketio.on("new score", namespace='/game')
+def newscore(data):
+    newscore = data['score']
+    dbuser = db.session.query(User).filter_by(username=data['username'])\
+        .first()
+    if newscore < dbuser.score:
+        dbuser.score = newscore
+        db.session.commit()
+    global bestScore
+    global bestUser
+    if newscore < bestScore:
+        bestScore = newscore
+        bestUser = data['username']
+        emit(
+            'update score', {'bestScore': bestScore, 'bestUser': bestUser},
+            broadcast=True)
 
 
 def getRandomRoom():

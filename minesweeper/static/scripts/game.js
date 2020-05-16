@@ -1,4 +1,4 @@
-const startmines = 99;
+const startmines = 5;
 var mines;
 var gameover;
 var board;
@@ -213,6 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
       console.info(data.fromUser + ': no game');
       alert(`${data.fromUser} rejects your invitation`);
     };
+  });
+
+  //receive new best score
+  socket.on('update score', data => {
+    document.querySelector('#best_score').innerHTML = `World Best Score: ${data.bestScore} by ${data.bestUser}`
   });
   //End socketlisteners
 
@@ -567,6 +572,13 @@ function opencell(sid) {
     let face = document.querySelector('#top_area_face');
     face.classList.remove('top-area-face-unpressed');
     face.classList.add('top-area-face-win');
+    let oldsc = $('#user_score').attr('data-sc');
+    console.log(oldsc);
+    if (time < oldsc){
+      $('#user_score').attr('data-sc',time);
+      $('#user_score').html(`Your Best Score: ${time}`);
+      socket.emit('new score', {'score':time,'username':username});
+    }
     console.log('win');
   }
 
