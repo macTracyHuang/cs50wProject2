@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function load_msg(channel){
+    nameSet.clear();
     const ch = channel
     document.querySelector('#currentCh').innerHTML = ch;
     //load messages of a channels
