@@ -76,6 +76,9 @@ a[data-toggle="collapse"] {
   height:7%;
 }
 
+.write_msg,.msg_send_btn{
+  height: -webkit-fill-available;
+}
 .incoming_msg_img {
   display: inline-block;
 }
@@ -101,6 +104,7 @@ a[data-toggle="collapse"] {
   margin: 0;
   padding: 5px 10px 5px 12px;
   width: 100%;
+  overflow-wrap: break-word;
 }
 
 .pmin_msg .received_withd_msg p {
@@ -125,6 +129,7 @@ a[data-toggle="collapse"] {
  margin: 0; color:#fff;
  padding: 5px 10px 5px 12px;
  width:100%;
+ overflow-wrap: break-word;
 }
 
 .pmoutgoing_msg > .sent_msg p {
@@ -141,7 +146,6 @@ a[data-toggle="collapse"] {
 #span1{
   display: block;
   overflow: hidden;
-  padding-right:8px;
 }
 
 #sidebar {
@@ -221,4 +225,5 @@ ul ul a {
     font-size: 0.9em !important;
     padding-left: 30px !important;
     background: #2e47b2;
+    overflow-wrap: break-word;
 }

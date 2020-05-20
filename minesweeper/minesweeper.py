@@ -6,6 +6,7 @@ import logging
 import random
 import string
 from models import User, db
+import datetime
 
 bp = Blueprint('minesweeper', __name__, static_folder='static',
                template_folder='templates')
@@ -53,7 +54,6 @@ def getusers():
     if request.method == 'GET':
         logging.debug(users)
         return jsonify({'success': True, 'users': list(users.keys())})
-
 
 # Socket
 @socketio.on('connect', namespace='/game')
@@ -222,6 +222,16 @@ class Game:
             broadcast=True, include_self=False, room=self.room
             )
 
+    def sendmsg(self, data):
+        msg = data['msg']
+        fromUser = data['username']
+        time_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        newmsg = {
+            'username': fromUser, 'msg': msg, 'time_date': time_date}
+        emit(
+            "new msg", {'newmsg': newmsg, 'fromUser': fromUser},
+            broadcast=True, room=self.room)
+
 
 @socketio.on("invite game", namespace='/game')
 def new_game(data):
@@ -309,6 +319,12 @@ def newscore(data):
         emit(
             'update score', {'bestScore': bestScore, 'bestUser': bestUser},
             broadcast=True)
+
+
+@socketio.on("send msg", namespace='/game')
+def msg_send(data):
+    game = games.get(data['roomid'])
+    game.sendmsg(data)
 
 
 def getRandomRoom():

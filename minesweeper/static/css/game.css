@@ -1,3 +1,31 @@
+@import url("../../../static/css/channels.css");
+#game_msg {
+  z-index: 10;
+}
+
+.wrapper {
+  display: flex;
+  width: 150px;
+  height: 50vh;
+  align-items: stretch;
+  border-collapse: collapse;
+}
+
+#content2 {
+  height: 100%;
+}
+
+.type_msg {
+  height: 7%;
+}
+
+.msg_history {
+  height: 93% x;
+  min-width: 100px;
+  overflow-y: auto;
+  /* border: 2px solid; */
+}
+
 body::after {
   position: absolute;
   width: 0;
@@ -91,44 +119,44 @@ body::after {
   user-select: none;
 }
 
-.wrapper {
+.game-wrapper {
   border-collapse: separate;
 }
 
-.wrapper-border, .wrapper-border-right-bottom, .wrapper-border-left-bottom, .wrapper-border-right-top, .wrapper-border-left-top, .wrapper-border-t-right, .wrapper-border-t-left, .wrapper-border-hor, .wrapper-border-vert {
+.game-wrapper-border, .game-wrapper-border-right-bottom, .game-wrapper-border-left-bottom, .game-wrapper-border-right-top, .game-wrapper-border-left-top, .game-wrapper-border-t-right, .game-wrapper-border-t-left, .game-wrapper-border-hor, .game-wrapper-border-vert {
   background-size: 100% 100%;
   float: left;
 }
 
-.wrapper-border-vert {
+.game-wrapper-border-vert {
   background-image: url("../img/border_vert_2x.png");
 }
 
-.wrapper-border-hor {
+.game-wrapper-border-hor {
   background-image: url("../img/border_hor_2x.png");
 }
 
-.wrapper-border-t-left {
+.game-wrapper-border-t-left {
   background-image: url("../img/t_left_2x.png");
 }
 
-.wrapper-border-t-right {
+.game-wrapper-border-t-right {
   background-image: url("../img/t_right_2x.png");
 }
 
-.wrapper-border-left-top {
+.game-wrapper-border-left-top {
   background-image: url("../img/corner_up_left_2x.png");
 }
 
-.wrapper-border-right-top {
+.game-wrapper-border-right-top {
   background-image: url("../img/corner_up_right_2x.png");
 }
 
-.wrapper-border-left-bottom {
+.game-wrapper-border-left-bottom {
   background-image: url("../img/corner_bottom_left_2x.png");
 }
 
-.wrapper-border-right-bottom {
+.game-wrapper-border-right-bottom {
   background-image: url("../img/corner_bottom_right_2x.png");
 }
 
@@ -242,7 +270,7 @@ body::after {
   font-size: 18px;
 }
 
-.footer{
+.footer {
   min-width: 786px;
 }
 

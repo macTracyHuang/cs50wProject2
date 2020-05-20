@@ -213,37 +213,41 @@ document.addEventListener('DOMContentLoaded', () => {
       update_onclick()
   });
 
-  //Enable press Enter to send messages
-  document.querySelector('.write_msg').onkeypress = event => {
-  // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
-      // Cancel the default action, if needed
-      event.preventDefault();
-      // Trigger the button element with a click
-      $('.msg_send_btn').click();
+  function message (){
+    //Enable press Enter to send messages
+    document.querySelector('.write_msg').onkeypress = event => {
+    // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        $('.msg_send_btn').click();
+      }
+    };
+    //When a message is sent, emit it to the server
+    document.querySelector('.msg_send_btn').onclick = () => {
+      if(pmto===undefined){
+        pmto = 'undefined';
+      }
+      const msg = document.querySelector('.write_msg').value;
+      document.querySelector('.write_msg').value='';
+      console.log(pmto);
+      socket.emit('send msg',{'username':username,'msg':msg,'cur_ch':cur_ch,'pmto':pmto});
     }
-  };
-  //When a message is sent, emit it to the server
-  document.querySelector('.msg_send_btn').onclick = () => {
-    if(pmto===undefined){
-      pmto = 'undefined';
-    }
-    const msg = document.querySelector('.write_msg').value;
-    document.querySelector('.write_msg').value='';
-    console.log(pmto);
-    socket.emit('send msg',{'username':username,'msg':msg,'cur_ch':cur_ch,'pmto':pmto});
+
+    //Message announced
+    socket.on('new msg', data => {
+      const ch=data['ch'];
+      const msg=data['newmsg'];
+      if(ch === cur_ch){
+        console.log('new msg');
+        convert_msg(msg);
+      }
+      document.querySelector('.msg_history').scrollTop = 9999999;
+    });
   }
 
-  //Message announced
-  socket.on('new msg', data => {
-    const ch=data['ch'];
-    const msg=data['newmsg'];
-    if(ch === cur_ch){
-      console.log('new msg');
-      convert_msg(msg);
-    }
-    document.querySelector('.msg_history').scrollTop = 9999999;
-  });
+  message();
   //enable link
   $('#btn-game').attr('hidden', false);
 });

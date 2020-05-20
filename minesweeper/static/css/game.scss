@@ -1,3 +1,31 @@
+@import url("../../../static/css/channels.css");
+
+#game_msg{
+  z-index: 10;
+}
+.wrapper{
+    display: flex;
+    width: 150px;
+    height: 50vh;
+    align-items: stretch;
+    border-collapse: collapse;
+}
+
+#content2{
+  height:100%;
+}
+
+.type_msg{
+  height:7%;
+}
+
+.msg_history {
+  height:93%x;
+  min-width: 100px;
+  overflow-y: auto;
+  /* border: 2px solid; */
+}
+
 body::after{
    position:absolute; width:0; height:0; overflow:hidden; z-index:-1; // hide images
    content:url("../img/type0.svg") url("../img/type1.svg") url("../img/type2.svg") url("../img/type3.svg") url("../img/type4.svg") url("../img/type5.svg") url("../img/type6.svg") url("../img/type7.svg") url("../img/type8.svg") url("../img/mine.svg") url("../img/mine_red.svg") url("../img/mine_wrong.svg") url("../img/flag.svg");   // load images
@@ -87,53 +115,53 @@ body::after{
   user-select: none;
 }
 
-.wrapper {
+.game-wrapper {
   border-collapse: separate;
 }
 
-.wrapper-border{
+.game-wrapper-border{
   background-size: 100% 100%;
   float: left;
 }
 
-.wrapper-border-vert {
-  @extend .wrapper-border;
+.game-wrapper-border-vert {
+  @extend .game-wrapper-border;
   background-image: url("../img/border_vert_2x.png");
 }
 
-.wrapper-border-hor {
-  @extend .wrapper-border;
+.game-wrapper-border-hor {
+  @extend .game-wrapper-border;
   background-image: url("../img/border_hor_2x.png");
 }
 
 
-.wrapper-border-t-left {
-  @extend .wrapper-border;
+.game-wrapper-border-t-left {
+  @extend .game-wrapper-border;
   background-image: url("../img/t_left_2x.png");
 }
 
-.wrapper-border-t-right {
-  @extend .wrapper-border;
+.game-wrapper-border-t-right {
+  @extend .game-wrapper-border;
   background-image: url("../img/t_right_2x.png");
 }
 
-.wrapper-border-left-top {
-  @extend .wrapper-border;
+.game-wrapper-border-left-top {
+  @extend .game-wrapper-border;
   background-image: url("../img/corner_up_left_2x.png");
 }
 
-.wrapper-border-right-top {
-  @extend .wrapper-border;
+.game-wrapper-border-right-top {
+  @extend .game-wrapper-border;
   background-image: url("../img/corner_up_right_2x.png");
 }
 
-.wrapper-border-left-bottom {
-  @extend .wrapper-border;
+.game-wrapper-border-left-bottom {
+  @extend .game-wrapper-border;
   background-image: url("../img/corner_bottom_left_2x.png");
 }
 
-.wrapper-border-right-bottom {
-  @extend .wrapper-border;
+.game-wrapper-border-right-bottom {
+  @extend .game-wrapper-border;
   background-image: url("../img/corner_bottom_right_2x.png");
 }
  //tope Area
