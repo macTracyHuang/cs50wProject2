@@ -11,9 +11,8 @@ socketio = SocketIO(app)
 app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
 
 # Tell Flask what SQLAlchemy databas to use.
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://lavryymoqltgmo:1c8c4b805c108437893d706cd3\
-236b20b827152b6625d2b98500fb606c870de3@ec2-52-201-55-4.compute-1.amazonaws.com:5432/d89j9hhccicq8l" # noqa
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+#app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://lavryymoqltgmo:1c8c4b805c108437893d706cd3236b20b827152b6625d2b98500fb606c870de3@ec2-52-201-55-4.compute-1.amazonaws.com:5432/d89j9hhccicq8l" # noqa
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Session configuration
