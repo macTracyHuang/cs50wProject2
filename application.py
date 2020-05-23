@@ -6,12 +6,21 @@ from functools import wraps
 from minesweeper import bp as game_bp
 from setup import app, socketio
 import logging
+import sys
 
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(
     level=logging.DEBUG, filename='myLog.log', filemode='w', format=FORMAT)
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
 
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler)
 
 app.register_blueprint(game_bp, url_prefix='/game')
 
