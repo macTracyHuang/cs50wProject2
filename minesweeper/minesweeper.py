@@ -12,8 +12,8 @@ bp = Blueprint('minesweeper', __name__, static_folder='static',
                template_folder='templates')
 
 users = {}
-bestScore = 198
-bestUser = "Apple"
+bestScore = 0
+bestUser = ""
 ingame = []
 games = {}
 @bp.route('/')
@@ -314,6 +314,7 @@ def newscore(data):
     global bestScore
     global bestUser
     if newscore < bestScore:
+        logging.info(bestScore)
         bestScore = newscore
         bestUser = data['username']
         emit(
